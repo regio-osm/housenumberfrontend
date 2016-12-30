@@ -1,0 +1,11 @@
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{titel}}{% endblock %}
+
+{% block content %}
+<p class='errortitle'>{{ __("Following error occured") }}:</p>
+<p class='errormessage'>{{fehlermeldung}}</p>
+<form action="{{fortsetzurl}}" method="get">
+<input type="submit" value="ok">
+</form>
+{% endblock %}

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html>
+
+<!--  
+
+			ToDo: Straßenliste ist durcheinander, weil über features Index jetzt dynamisch nichts bringt, eine ID muss genommen werden, ggfs. ergänzen
+			ToDo: serverseitig im OSM-file die timestamps liefern
+			ToDo: popup geht nicht wieder zu auf Anforderung
+-->
+
+
+
+
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../css/normalize.css">
+        <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="../css/main.css">
+        <link rel="stylesheet" type="text/css" href="../css/farben_colorbrewer_diverging7_5.css">
+        <title>OSM-Hausnummernauswertung</title>
+
+        <script src="http://openlayers.org/api/OpenLayers.js"></script>
+        <script src="http://openstreetmap.org/openlayers/OpenStreetMap.js"></script>
+        <!--script src="OpenLayers-2.12/lib/OpenLayers.js"></script-->
+        <!--script src="OpenStreetMap.js"></script-->
+	    <style>
+	        #map {
+	            height: 600px;
+	            width: 1200px;
+	        }
+	    </style>
+        <script type="text/javascript">
+			window.$ = OpenLayers.Util.getElement;	// necessary for OL 2.13
+
+			var lat=48.3689;
+			var lon=10.8977;
+			var zoom=13;
+			var global_map;
+			var hnr_layer;
+			var hausnummern_layer;
+			var hausnummern_selectcontrol;
+			var selectedFeature_popup;
+			var feature_search_indexes = [];
+			var streetlist = [];
+
+			var global_ajax_requesttime;
+			var global_ajax_responsetime;
+
+
+			function loadjscssfile(filename, filetype) {
+				if (filetype=="css") { //if filename is an external CSS file
+					var fileref=document.createElement("link");
+					fileref.setAttribute("rel", "stylesheet");
+					fileref.setAttribute("type", "text/css");
+					fileref.setAttribute("id", "farbencss");
+					fileref.setAttribute("href", filename);
+				}
+				if (typeof fileref != "undefined")
+					document.getElementsByTagName("head")[0].appendChild(fileref);
+			}
+
+
+			function statemessage(meldetext) {
+				if(document.getElementById("loadstatus") == undefined)
+					return;
+				document.getElementById("loadstatus").innerHTML = meldetext;
+			}
+
+			function debugmeldung(meldetext) {
+				if(document.getElementById("debug") == undefined)
+					return;
+				document.getElementById("debug").innerHTML = meldetext;
+				//document.getElementById("debug").innerHTML = meldetext + "<br>" + document.getElementById("debug").innerHTML;
+			}
+
+				// change complete color scheme: load dynamically a farben...css file which contains the colors for abdeck_0 .. abdeck_100)
+			function change_colors(colorselect_object) {
+				statemessage("Laden Overlay Hausnummernabdeckung");
+				var colorvalue = colorselect_object.value;
+				loadjscssfile("../css/" + colorvalue + ".css", "css"); ////dynamically load and add this .css file
+					// ok, manually restyle features, should be work better automatically, but how?
+				for(var featuresindex in hausnummern_layer.features) {
+					var feature = hausnummern_layer.features[featuresindex];
+					hausnummern_layer.features[featuresindex] = style_hausnummernabdeckung(feature);
+					hausnummern_layer.drawFeature(feature);
+				}
+				hausnummern_layer.refresh();
+				statemessage("");
+			}
+
+				// get color for inparam elementid (abdeck_0 .. abdeck_100) from legend-entries, which is set properly by active farben...css
+			function legend_color(elementid) {
+				var returncode_color_hexcode = "";
+				var object_legende_100 = document.getElementById("legende_" + elementid);
+// TODO window.getComputedStyle wird von IE8 und älter nicht unterstützt, evtl. gibt es eine jquery Lösung
+				var act_bg_color_rgbcode = window.getComputedStyle(object_legende_100,null).getPropertyValue("background-color");
+				if (act_bg_color_rgbcode.search("rgb") == -1)
+					return act_bg_color_rgbcode;
+				else {
+					var act_bg_color_array = act_bg_color_rgbcode.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+					function hex(x) {
+						return ("0" + parseInt(x).toString(16)).slice(-2);
+					}
+					returncode_color_hexcode = "#" + hex(act_bg_color_array[1]) + hex(act_bg_color_array[2]) + hex(act_bg_color_array[3]);
+				}
+				return returncode_color_hexcode;
+			}
+
+
+			function onPopupClose(evt) {
+			    hausnummern_selectcontrol.unselect(selectedFeature_popup);
+			}
+
+
+	        function onFeatureSelect(feature) {
+	            var type ="way";
+	            if (feature.geometry.CLASS_NAME == "OpenLayers.Geometry.Point") {
+	                type = "node";
+	            }
+				var text = "";
+				if(feature.attributes['name'] != undefined)
+					text += "<h4 align=center>" + feature.attributes['name'] + "</h4>\n";
+		    	text += "<table border='all'>\n";
+				if(feature.attributes['hnr_osm'] != undefined)
+					text += "<tr><td>Anzahl Hnrn. in OSM</td>" + "<td>" + feature.attributes['hnr_osm'] + "</td></tr>\n";
+				if(feature.attributes['hnr_soll'] != undefined)
+					text += "<tr><td>Anzahl Hnrn. Soll</td>" + "<td>" + feature.attributes['hnr_soll'] + "</td></tr>\n";
+				if(feature.attributes['hnr_abdeck'] != undefined)
+					text += "<tr><td>OSM-Abdeckung Hnrn. in %</td>" + "<td>" + feature.attributes['hnr_abdeck'] + " %</td></tr>\n";
+				if(feature.attributes['hnr_fhlosm'] != undefined)
+					text += "<tr><td>Anzahl Hnrn. fehlend in OSM</td>" + "<td>" + feature.attributes['hnr_fhlosm'] + "</td></tr>\n";
+				if(feature.attributes['hnr_nurosm'] != undefined)
+					text += "<tr><td>Anzahl Hnrn. nur in OSM</td>" + "<td>" + feature.attributes['hnr_nurosm'] + "</td></tr>\n";
+				if(feature.attributes['hnr_liste'] != undefined)
+					text += "<tr><td>Liste fehlende Hnrn. in OSM</td>" + "<td>" + feature.attributes['hnr_liste'] + "</td></tr>\n";
+	            for (var key in feature.attributes) {
+					if	(	(key == 'name') || (key == 'hnr_osm') || (key == 'hnr_soll') || (key == 'hnr_abdeck') || (key == 'hnr_liste') ||
+							(key == 'hnr_fhlosm') || (key == 'hnr_nurosm')
+						)
+						continue;
+	                text += "<tr><td>" + key + "</td>" + "<td>" + feature.attributes[key] + "</td></tr>\n";
+	            }
+				if(feature.attributes['osm_id'] != undefined)
+		            text += "<tr><td>Weg in OSM</td>" + "<td>" + "<a target = 'osmkarte' href='http://www.openstreetmap.org/?way=" + feature.attributes.osm_id + "'>" + feature.attributes['name'] + " in OSM-Karte</a></td></tr>\n";
+				text += "</table>\n";
+	            //statemessage(text);
+
+					// raus aufs PopUp
+				selectedFeature_popup = feature;
+				var popup = new OpenLayers.Popup.FramedCloud("chicken", 
+					feature.geometry.getBounds().getCenterLonLat(),
+					null,
+					"<div style='font-size:.8em'>" + text + "</div>",
+					null, true, onPopupClose);
+					feature.popup = popup;
+					global_map.addPopup(popup);
+
+
+	        }   
+
+	        function onFeatureUnselect(feature) {
+				// hier popup schliessen
+			    global_map.removePopup(feature.popup);
+			    feature.popup.destroy();
+			    feature.popup = null;
+			}
+
+	
+			function set_hnrtheo_attributes(hausnummer_feature) {
+				for (var hnrindex in hnr_layer.features) {
+					hnrfeature = hnr_layer.features[hnrindex];
+					if(hausnummer_feature.attributes["name"] == hnrfeature.attributes["Gemeinde"]) {
+						var anzahl_adressen = 0;
+						var gliederungstadtland = 0;
+						var bevoelkerungszahl = 0;
+						for(var attri in hnrfeature.attributes) {
+							var tempor = hnrfeature.attributes[attri];
+							hausnummer_feature.attributes[attri] = hnrfeature.attributes[attri];
+							
+							if(attri == "Bevoelkerungszahl")
+								bevoelkerungszahl = tempor;
+							if(attri == "Anzahl_Adressen")
+								anzahl_adressen = tempor;
+							if(attri == "gliederungstadtland")
+								gliederungstadtland = tempor;
+							if(attri == "flaechekm2")
+								flaechekm2 = tempor;
+						}
+						var faktor = 0;
+						var abdeckung = 0.0;
+						var anzahl_solladressen = 0;
+						var dichte = 0;
+						if(gliederungstadtland != 0) {
+							if(gliederungstadtland == 1)
+								faktor = 6.5;
+							else if(gliederungstadtland == 2)
+								faktor = 4.5;
+							else if(gliederungstadtland == 3)
+								faktor = 3.0;
+							if((bevoelkerungszahl > 0) && (flaechekm2 > 0)){
+								dichte = bevoelkerungszahl / flaechekm2;
+								faktor = 0.0013786206 * dichte + 3,1463418179;		// jetzt über Formel
+
+								anzahl_solladressen = bevoelkerungszahl / faktor;
+								abdeckung = anzahl_adressen / anzahl_solladressen;
+							}
+						}
+						hausnummer_feature.attributes["Abdeckung"] = abdeckung;
+					}
+				}
+			}
+			
+      function style_hausnummernabdeckung(feature) {
+			if(feature.attributes.Gemeinde == undefined) {
+				set_hnrtheo_attributes(feature);
+			}
+			feature.style = OpenLayers.Util.extend({'fill':'black'}, OpenLayers.Feature.Vector.style['default']);
+			feature.style.strokeOpacity = 0.7;
+			feature.style.strokeWidth = 1; // Rahmenlinienbreite
+			feature.style.strokeColor = "#FFFFFF"; // Rahmen in weiß
+			feature.style.fillOpacity = 0.6;
+			
+
+			var abdeckung = parseFloat(feature.attributes.Abdeckung);
+			feature.style.fillColor = legend_color("abdeck_invalid");
+			if(abdeckung >= 1.0) {
+				feature.style.fillColor = legend_color("abdeck_100");
+				feature.style.strokeColor = "#FFFFFF";
+				//feature.style.strokeWidth = 5;
+			} else if((abdeckung >= 0.95)
+					&& (abdeckung < 1.0)) {
+				feature.style.fillColor = legend_color("abdeck_95");
+			} else if((abdeckung >= 0.75)
+					&& (abdeckung < 0.95)) {
+				feature.style.fillColor = legend_color("abdeck_85");
+			} else if((abdeckung >= 0.5)
+					&& (abdeckung < 0.75)) {
+				feature.style.fillColor = legend_color("abdeck_75");
+			} else if((abdeckung >= 0.25)
+					&& (abdeckung < 0.5)) {
+				feature.style.fillColor = legend_color("abdeck_50");
+			} else if((abdeckung > 0.0)
+					&& (abdeckung < 0.25)) {
+				feature.style.fillColor = legend_color("abdeck_25");
+			} else if(abdeckung == 0.0) {
+				feature.style.fillColor = legend_color("abdeck_0");
+			}
+			
+			return feature;
+		}
+
+
+			function show_selected_street(select_feature_ids) {
+				if(select_feature_ids.value == "")
+					return;
+				var testoutput = "";
+					// first, reset previously selected features to origin style
+				if(feature_search_indexes != undefined) {
+					for(var searchindex = 0; searchindex < feature_search_indexes.length; searchindex++) {
+						var feature = hausnummern_layer.getFeatureById(feature_search_indexes[searchindex]);
+						if(feature != undefined) {
+								// restore original property to yet marked features
+					        feature.style.strokeWidth = feature.style.strokeWidth_origin;
+							feature.style.strokeWidth_origin = undefined;
+							feature.style.strokeColor = feature.style.strokeColor_origin;
+							feature.style.strokeColor_origin = undefined;
+							hausnummern_layer.drawFeature(feature);
+						}
+					}
+					feature_search_indexes.length = 0;
+				}
+					// now, show selected street (one of more parts) with extra style properties
+				var feature_id_list = select_feature_ids.value.split(",");
+				for(var idindex=0; idindex < feature_id_list.length; idindex++) {
+					var feature_id = feature_id_list[idindex];
+					if(feature_id == "")
+						continue;
+					if(hausnummern_layer.getFeatureById(feature_id) != undefined) {
+						var feature = hausnummern_layer.getFeatureById(feature_id)
+						testoutput += "[" + feature.attributes.name + "] hat .id " + feature.id;
+						var latlon_object = feature.geometry.getBounds().getCenterLonLat();
+							// store original property values in new attributes
+			            feature.style.strokeWidth_origin = feature.style.strokeWidth;
+						feature.style.strokeColor_origin = feature.style.strokeColor;
+			            feature.style.strokeWidth = 20;
+						feature.style.strokeColor = "#000000";
+						feature_search_indexes[feature_search_indexes.length] = feature.id;
+						hausnummern_layer.drawFeature(feature);
+						global_map.setCenter(latlon_object);
+						global_map.setZoom((global_map.getNumZoomLevels() - 1));
+					}
+				}
+				//alert("in show_selected_street angekommen, textoutput ==="+testoutput);
+			}
+
+
+			function layer_hausnummern_visible_postactions() {
+					// ok, let other postaction function first do something (here only display number of features)
+					// this contains the layer object (here hausnummern_layer)
+				make_features_added_closure(this);
+
+				statemessage("");
+
+					// get special meta information about housenumber evaluation times, which are inside osm data file at special object
+					// and display on html page
+				var anzahl_features = 0;
+				if( (this.features != undefined) && 
+					(this.features.length > 0)) {
+					evaluationinfo_object = document.getElementById("evaluationinfo");
+					if(evaluationinfo_object != undefined) {
+						for(var featuresindex in this.features) {
+							anzahl_features++;
+							var feature = this.features[featuresindex];
+							if(feature.attributes.internal_evaluation_state_object != undefined) {
+								var temp_date_object = new Date(feature.attributes.evaluation_starttime);
+								evaluationinfo_object.innerHTML = 'Auswertung: ';
+									evaluationinfo_object.innerHTML += feature.attributes.evaluation_starttime;
+								evaluationinfo_object.innerHTML += '<br>OSM DB-Stand: ';
+								var temp_date_object = new Date(feature.attributes.evaluation_dbtime);
+									evaluationinfo_object.innerHTML += feature.attributes.evaluation_dbtime;
+							}
+							var act_name = feature.attributes.name;
+							if(act_name != undefined) {
+								if(streetlist[act_name] != undefined)
+									streetlist[act_name] += "," + feature.id;
+								else
+									streetlist[act_name] = feature.id;
+							}
+						}
+					}
+				}
+				var select_output_options = "";
+				for(var streetlistitem in streetlist) {
+					select_output_options += "<option value='" + streetlist[streetlistitem] + "'>" + streetlistitem + "</option>";
+				}
+				if(select_output_options != "") {
+					if(document.getElementById("streetlistselect") != undefined) {
+						select_output = "<select onchange='show_selected_street(this);'>";
+						select_output += "<option value=''>bitte auswählen</option>";
+						select_output += select_output_options + "</select>\n";
+						document.getElementById("streetlistselect").innerHTML = select_output + "\n";
+					}
+				}
+			}
+
+
+			OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
+
+				genericUrl: "/hausnummerauswertung/grafikdarstellung/datenanforderung",
+				tolerance: 0.0,
+				map: "",
+      
+				defaultHandlerOptions: {
+				  'single': true,
+				  'double': false,
+				  'pixelTolerance': 0,
+				  'stopSingle': false,
+				  'stopDouble': false
+				},
+	
+				initialize: function(url, tolerance, map) {
+					this.genericUrl = url;
+					this.tolerance = tolerance;
+					this.map = map;
+	
+				this.handlerOptions = OpenLayers.Util.extend(
+					{}, this.defaultHandlerOptions
+				);
+				OpenLayers.Control.prototype.initialize.apply(
+					this, arguments
+				); 
+				this.handler = new OpenLayers.Handler.Click(
+					this, {
+						'click': this.trigger
+					}, this.handlerOptions
+				);
+			}, 
+
+			trigger: function(evt) {
+				var lonlat = global_map.getLonLatFromPixel(evt.xy)
+					.transform(new OpenLayers.Projection("EPSG:900913"),
+					new OpenLayers.Projection("EPSG:4326"));
+	      
+				var popup = new OpenLayers.Popup("location_info",
+					new OpenLayers.LonLat(lonlat.lon, lonlat.lat)
+					.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913")),
+					null,
+					"Loading ...",
+					true);
+	  
+				popup.contentSize = new OpenLayers.Size(400, 400);
+				popup.closeOnMove = true;
+				global_map.addPopup(popup);
+
+				var rel_tolerance = this.tolerance * global_map.getScale();
+				if (rel_tolerance > 0.01)
+					rel_tolerance = 0.01;
+
+				var request = OpenLayers.Request.GET({
+					url: this.genericUrl + "&bbox="
+					+ (lonlat.lon - rel_tolerance) + "," + (lonlat.lat - rel_tolerance) + ","
+					+ (lonlat.lon + rel_tolerance) + "," + (lonlat.lat + rel_tolerance),
+					async: false
+				});
+	  
+				global_map.removePopup(popup);
+				popup.contentHTML = request.responseText;
+				global_map.addPopup(popup);
+			}
+		});
+
+		var zoom_valid = true;
+		var load_counter = 0;      
+
+		function make_features_added_closure(layer) {
+			var layer_ = layer;
+			return function(evt) {
+				debugmeldung("Displaying " + layer_.features.length + " features ...");
+			};
+		}
+
+		OSMTimeoutFormat = OpenLayers.Class(OpenLayers.Format.OSM, {
+			initialize: function(strategy) {
+				this.strategy = strategy;
+			},
+
+			read: function(doc) {
+				var feat_list = OpenLayers.Format.OSM.prototype.read.apply(this, [doc]);
+
+				if (typeof doc == "string") {
+					doc = OpenLayers.Format.XML.prototype.read.apply(this, [doc]);
+				}
+	      
+				if (this.strategy) {
+					var node_list = doc.getElementsByTagName("remark");
+					if (node_list.length > 0) {
+						debugmeldung("Please zoom in to view data.");
+						this.strategy.bounds = null;
+					}
+				}
+
+				return feat_list;
+			},
+	  
+			strategy: null,
+
+			CLASS_NAME: "OSMTimeoutFormat"
+		});
+
+
+		ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
+
+			zoom_data_limit: 13,
+
+			initialize: function(zoom_data_limit) {
+				this.zoom_data_limit = zoom_data_limit;
+			},
+
+			update: function(options) {
+				this.ratio = this.layer.ratio;
+				var mapBounds = this.getMapBounds();
+				if (this.layer && this.layer.map && this.layer.map.getZoom() < this.zoom_data_limit) {
+					debugmeldung("Please zoom in to view data.");
+					zoom_valid = false;
+
+					this.bounds = null;
+				}
+				else if (mapBounds !== null && ((options && options.force) ||
+					this.invalidBounds(mapBounds))) {
+					++load_counter;
+					//debugmeldung("Loading data ...");
+					zoom_valid = true;
+
+					this.calculateBounds(mapBounds);
+					this.resolution = this.layer.map.getResolution();
+					this.triggerRead(options);
+				}
+			},
+
+			CLASS_NAME: "ZoomLimitedBBOXStrategy"
+		});
+
+
+		
+			function init() {
+
+				global_map = new OpenLayers.Map (
+					"map", {
+						controls:[
+							new OpenLayers.Control.Navigation(),
+							new OpenLayers.Control.PanZoomBar(),
+							new OpenLayers.Control.LayerSwitcher(),
+							new OpenLayers.Control.Attribution(),
+                   	new OpenLayers.Control.KeyboardDefaults(),
+							new OpenLayers.Control.Permalink()
+						],
+						maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
+						maxResolution: 156543.0399,
+						numZoomLevels: 20,
+						units: 'm',
+						projection: new OpenLayers.Projection("EPSG:900913"),
+						displayProjection: new OpenLayers.Projection("EPSG:4326")
+				});
+
+				OpenLayers.Feature.Vector.style['default'].strokeWidth = 4;
+				OpenLayers.Feature.Vector.style['default'].cursor = 'pointer';
+
+				global_map.addLayer(
+						// Programmcode von Black & White Layer von https://osm.wno-edv-service.de/boundaries/ übernommen
+						new OpenLayers.Layer.OSM('schwarz/weiße Karte', 
+			                       ['https://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
+			                        'https://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
+			                        'https://c.tile.openstreetmap.org/${z}/${x}/${y}.png'],
+		            {
+							attribution:					'&copy; <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> contributors', 
+							displayInLayerSwitcher:		true,
+							displayProjection:			new OpenLayers.Projection("EPSG:4326"),
+							isBaseLayer:					true,
+							visibility:						true,
+							opacity:                 	1, 
+							numZoomLevels:					19, 
+							permalink:						"mono", 
+							eventListeners: {
+								tileloaded: function(evt) {
+									var ctx = evt.tile.getCanvasContext();
+									if (ctx) {
+										var imgd = ctx.getImageData(0, 0, evt.tile.size.w, evt.tile.size.h);
+										var pix = imgd.data;
+										for (var i = 0, n = pix.length; i < n; i += 4) {
+											pix[i] = pix[i + 1] = pix[i + 2] = (3 * pix[i] + 4 * pix[i + 1] + pix[i + 2]) / 8;
+										}
+										ctx.putImageData(imgd, 0, 0);
+										evt.tile.imgDiv.removeAttribute("crossorigin");
+										evt.tile.imgDiv.src = ctx.canvas.toDataURL();
+									}
+								}
+							}
+				}));
+
+				global_map.addLayer(new OpenLayers.Layer.OSM.Mapnik(
+					"Mapnik",
+					{ maxZoomLevel: 19, numZoomLevels: 20 }
+				));
+
+				global_map.addLayer(new OpenLayers.Layer.OSM.Mapnik(
+					"Mapnik, halbtransparent",
+					{ maxZoomLevel: 19, numZoomLevels: 20, opacity: 0.5 }
+				));
+
+				global_map.addLayer(new OpenLayers.Layer.OSM(
+					"ohne Hintergrund",
+					"blank.gif",
+					{ maxZoomLevel: 19, numZoomLevels: 20 }
+				));
+
+				
+				var dataarea = "DE_NW";
+				var lat = 49.94333;
+				var lon = 7.61279;
+				var zoom = 8;
+				var country = "Bundesrepublik Deutschland";
+
+				if (document.URL.indexOf("file=") != -1) {
+					var abpos = document.URL.indexOf("file=") + 5;
+					dataarea = document.URL.substring(abpos);
+					if (dataarea.indexOf("?") != -1)
+						dataarea = dataarea.substring(0, dataarea.indexOf("?"));
+					if (dataarea.indexOf("&") != -1)
+						dataarea = dataarea.substring(0, dataarea.indexOf("&"));
+				}
+
+				if (dataarea == "DE_BB") {
+					lat = 51.95363;
+					lon = 13.41632;
+					zoom = 8;
+				} else if (dataarea == "DE_BE") {
+					lat = 52.49479;
+					lon = 13.41357;
+					zoom = 10;
+				} else if (dataarea == "DE_BW") {
+					lat = 48.35175;
+					lon = 9.27722;
+					zoom = 8;
+				} else if (dataarea == "DE_BY") {
+					lat = 49.066;
+					lon = 11.584;
+					zoom = 7;
+				} else if (dataarea == "DE_HB") {
+					lat = 53.11735;
+					lon = 8.74231;
+					zoom = 11;
+				} else if (dataarea == "DE_HE") {
+					lat = 50.56498;
+					lon = 9.30468;
+					zoom = 8;
+				} else if (dataarea == "DE_HH") {
+					lat = 53.55424;
+					lon = 10.03253;
+					zoom = 10;
+				} else if (dataarea == "DE_MV") {
+					lat = 53.91652;
+					lon = 12.63903;
+					zoom = 8;
+				} else if (dataarea == "DE_NI") {
+					lat = 52.55409;
+					lon = 9.09045;
+					zoom = 7;
+				} else if (dataarea == "DE_NW") {
+					lat = 51.39841;
+					lon = 7.67321;
+					zoom = 8;
+				} else if (dataarea == "DE_RP") {
+					lat = 49.94333;
+					lon = 7.61279;
+					zoom = 8;
+				} else if (dataarea == "DE_SH") {
+					lat = 54.35421;
+					lon = 9.42553;
+					zoom = 8;
+				} else if (dataarea == "DE_SL") {
+					lat = 49.36839;
+					lon = 6.8616;
+					zoom = 10;
+				} else if (dataarea == "DE_SN") {
+					lat = 51.06821;
+					lon = 13.43554;
+					zoom = 8;
+				} else if (dataarea == "DE_ST") {
+					lat = 52.10909;
+					lon = 12.44677;
+					zoom = 8;
+				} else if (dataarea == "DE_TH") {
+					lat = 50.90569;
+					lon = 11.57885;
+					zoom = 8;
+				} else if (dataarea == "AT") {
+					country = "Österreich";
+					lat = 47.913;
+					lon = 13.67;
+					zoom = 7;
+				} else if (dataarea == "BR") {
+					country = "Brasil";
+					lat = -29.923;
+					lon = -53.065;
+					zoom = 7;
+				} else if (dataarea == "CH") {
+					country = "Schweiz";
+					lat = 46.97772;
+					lon = 8.33197;
+					zoom = 8;
+				} else if (dataarea == "LU") {
+					country = "Luxembourg";
+					lat = 49.78336;
+					lon = 6.22439;
+					zoom = 9;
+				}
+
+				var osmfile = "/listofstreets/osmdaten/strassenliste-" + dataarea + ".osm";
+
+				if (document.URL.indexOf("lat=") != -1) {
+					var abpos = document.URL.indexOf("lat=") + 4;
+					lat = document.URL.substring(abpos);
+					if (lat.indexOf("?") != -1)
+						lat = lat.substring(0, lat.indexOf("?"));
+					if (lat.indexOf("&") != -1)
+						lat = lat.substring(0, lat.indexOf("&"));
+					lat = parseFloat(lat);
+				}
+				if (document.URL.indexOf("lon=") != -1) {
+					var abpos = document.URL.indexOf("lon=") + 4;
+					lon = document.URL.substring(abpos);
+					if (lon.indexOf("?") != -1)
+						lon = lon.substring(0, lon.indexOf("?"));
+					if (lon.indexOf("&") != -1)
+						lon = lon.substring(0, lon.indexOf("&"));
+					lon = parseFloat(lon);
+				}
+				if (document.URL.indexOf("zoom=") != -1) {
+					var abpos = document.URL.indexOf("zoom=") + 4;
+					zoom = document.URL.substring(abpos);
+					if (zoom.indexOf("?") != -1)
+						zoom = zoom.substring(0, zoom.indexOf("?"));
+					if (zoom.indexOf("&") != -1)
+						zoom = zoom.substring(0, zoom.indexOf("&"));
+					zoom = parseInt(zoom);
+				}
+
+
+					// next line take an existing permalink in url
+    			if (!global_map.getCenter()) {
+					var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+					global_map.setCenter (lonLat, zoom);
+    			}
+
+    			hnr_layer = new OpenLayers.Layer.Vector(
+    					"Hnrtheo", {
+    						strategies : [ new OpenLayers.Strategy.Fixed() ],
+    						protocol : new OpenLayers.Protocol.HTTP({
+    							url : "hausnummerntheo-" + dataarea + ".osm",
+    							format : new OpenLayers.Format.OSM()
+    						}),
+    						projection : new OpenLayers.Projection("EPSG:4326")
+    					});
+    			global_map.addLayers([hnr_layer]);
+				hnr_layer.setVisibility(false);
+
+
+				hausnummern_layer = new OpenLayers.Layer.Vector(
+					"Hausnummernabdeckung", {
+						strategies : [ new OpenLayers.Strategy.Fixed() ],
+	                    //strategies: [new OpenLayers.Strategy.Fixed()],
+						protocol: new OpenLayers.Protocol.HTTP({
+							url : "/listofstreets/osmdaten/strassenliste-" + dataarea + ".osm",
+							format:		new OpenLayers.Format.OSM()
+						}),
+  		            projection: new OpenLayers.Projection("EPSG:4326")
+    	        });
+//				{visibility: false},
+
+				hausnummern_layer.events.register("loadstart", null, function() { statemessage("Laden Overlay Hausnummernabdeckung"); })
+				hausnummern_layer.events.register("loadend", null, function() { statemessage(""); })
+				hausnummern_layer.events.register("loadend", hausnummern_layer,  layer_hausnummern_visible_postactions );
+//				hausnummern_layer.events.register("featuresadded", hausnummern_layer, layer_hausnummern_visible_postactions);
+                      
+	            global_map.addLayers([hausnummern_layer]);
+		        hausnummern_layer.preFeatureInsert = style_hausnummernabdeckung;
+		        hausnummern_selectcontrol = new OpenLayers.Control.SelectFeature(hausnummern_layer, {'onSelect': onFeatureSelect, onUnselect: onFeatureUnselect});
+		        global_map.addControl(hausnummern_selectcontrol);
+		        hausnummern_selectcontrol.activate();
+
+
+
+				global_map.addLayer(new OpenLayers.Layer.OSM(
+					"fehlende Adressen (poole.ch)", 
+					"http://tile.poole.ch/noaddress/${z}/${x}/${y}.png", 
+					{visibility: false, attribution: '', numZoomLevels: 19, isBaseLayer: false, 
+						tileOptions: { crossOriginKeyword: null}}
+				));
+
+				global_map.addLayer(new OpenLayers.Layer.OSM(
+					"vorhandene Adressen (poole.ch)", 
+					"http://tile.poole.ch/has_address/${z}/${x}/${y}.png", 
+					{visibility: false, attribution: '', numZoomLevels: 19, isBaseLayer: false, 
+						tileOptions: { crossOriginKeyword: null}}
+				));
+
+        	}
+        </script>
+    </head>
+	<body onload="init();">
+		<div id="headerLogo" class="clearfix">
+           <div class="logo" ><img src="../img/logo-small.png" /></div>
+           <h1><a href="/hausnummerauswertung">Hausnummernauswertung auf regio-osm.de</a></h1>
+           <table width="100%"><tr><td><h2>Grafische Darstellung</h2></td><td><span id="loadstatus"></span></td></tr></table>
+        </div>
+	    <div id="tags"></div>
+		<table>
+			<tr valign='top'>
+				<td>
+					<div id="map" class="smallmap"></div>
+				</td>
+				<td>
+					<table>
+						<tr>
+							<td>
+								<span id="evaluationinfo">
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>Farbpalette 
+								<span>
+									<select onchange="change_colors(this);">
+										<option value="farben_colorbrewer_diverging7_5" selected="selected">rot nach blau</option>
+										<option value="farben_colorbrewer_diverging7_8">rot nach grün</option>
+										<option value="farben_colorbrewer_sequential_red">rot nach hellgelb</option>
+										<option value="farben_haessliche">lila..rot..grün kräftige F.</option>
+										<option value="farben_ampel">Ampel</option>
+									</select>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>Straßensuche 
+								<span id="streetlistselect">
+								</span>
+							<td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+
+		<table id='legendtable'>
+			<tr>
+				<td>Legende Farbe</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr><td id='legende_abdeck_100' class='abdeck_100'>&nbsp;<td>100 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_95' class='abdeck_95'>&nbsp;<td>95 bis unter 100 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_85' class='abdeck_85'>&nbsp;<td>75 bis unter 95 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_75' class='abdeck_75'>&nbsp;<td>50 bis unter 75 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_50' class='abdeck_50'>&nbsp;<td>25 bis unter 50 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_25' class='abdeck_25'>&nbsp;<td>&gt;0 bis unter 25 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_0' class='abdeck_0'>&nbsp;<td>0 % Abdeckung</td></tr>
+						<tr><td id='legende_abdeck_invalid' class='abdeck_invalid'>&nbsp;<td>ungültiger Wert</td></tr>
+					</table>
+				</td>
+				<td>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

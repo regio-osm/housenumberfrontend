@@ -1,0 +1,45 @@
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{ __("select area or subarea to see evaluation") }}{% endblock %}
+
+{% block headerscripts %}
+	<script type="text/javascript">
+			// jquery function for tooltips
+		$(function() {
+			$( document ).tooltip();
+		});
+	</script>
+{% endblock %}
+
+
+{% block content %}
+<form action="/housenumbers/showevaluation" method="get">
+<select name="job_ids" size="12" title="{{ __("Names without - (Dash) represent complete town, names with dash prefix show subareas") }}" multiple>
+{% for subarea in subareas %}
+<option value="{{ subarea.job }}">{{ subarea.einrueckung }} {{ subarea.name }}</option>
+{% endfor %}
+</select>
+<p>{{ __("optional parameter") }}</p>
+<input type="checkbox" name="ausgabefarbig" value="true" title="{{ __("result values will be showed with colored background, if checked") }}" checked><span title="{{ __("result values will be showed with colored background, if checked") }}">{{ __("show osm housenumber fulfilled in color") }}</span><br>
+<select name="linktyp" size="1" title="{{ __("'on OSM Map': Hyperlinks show details on OSM Map; 'on OSM Object infopage': Hyperlinks show details on OSM Map with additional object infos; 'no': no Hyperlinks on page") }}">
+<option value="osmkartevoll" selected>{{ __("on OSM Map") }}</option>
+<option value="osmbrowse">{{ __("on OSM Object infopage") }}</option>
+<option value="nein">{{ __("no") }}</option>
+</select>{{ __("show links to OSM objects") }}<br>
+<select name="unterdrueckfertigestrassen" size="1" title="{{ __("'hide completed streets': hide streets, where all housenumbers are in OSM; 'hide streets only, if no OSM-only housenumbers exists': streets with alle housenumbers will still be shown, if housenumbers are in OSM, which are not on the official list; 'show all streets': don't hide streets regardless of their completeness") }}">
+<option value="jaallevollstaendig">{{ __("hide completed streets") }}</option>
+<option value="javollstaendigohnenurosm">{{ __("hide streets only, if no OSM-only housenumbers exists") }}</option>
+<option value="nein" selected>{{ __("show all streets") }}</option>
+</select>{{ __("hide streets, if all housenumber are already in OSM") }}<br>
+<select name="unterdrueckspalten" size="1" title="{{ __("reduce output (for printing): 'hide..': identical housenumbers, if they are not important to look for; 'show..' don't hide columns") }}">
+<option value="jaidentische">{{ __("hide column identical housenumber") }}</option>
+<option value="nein" selected>{{ __("show all columns") }}</option>
+</select>{{ __("hide some table columns") }}<br>
+<input type="checkbox" name="hnrausgabe_gerade_ungerade" value="true" title="{{ __("display all pare housenumbers in only line, and impare housenumber in another line. Useful, if housenumbers are sorted in real in street") }}"><span title="{{ __("display all pare housenumbers in only line, and impare housenumber in another line. Useful, if housenumbers are sorted in real in street") }}">{{ __("show pare/impare housenumbers in different rows") }}>{{ __("show pare/impare housenumbers in different rows") }}</span><br>
+<input type="checkbox" name="nursummen" value="true" title="{{ __("don't show results for every street, just show a summary") }}"><span title="{{ __("don't show results for every street, just show a summary") }}">{{ __("show only sums, no individual streets") }}</span><br>
+<p></p>
+<input type="hidden" name="country" value="{{ params.countrycode }}">
+<input type="hidden" name="municipality" value="{{ params.municipality }}">
+<input type="submit" value="{{ __("start") }}">
+</form>
+{% endblock %}

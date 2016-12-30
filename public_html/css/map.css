@@ -1,0 +1,309 @@
+html {
+	margin-top: 1em;
+	width: 100%;
+	height: 100%;
+}
+
+body {	
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+}
+
+table {
+ 	border-collapse		:collapse;
+}
+
+#script {
+	height:			100%;
+	visibility:		hidden;
+}
+
+.ui-layout-pane {
+}
+
+.ui-layout-resizer {
+	background-color: 	#6B6 			!important;
+}
+.ui-layout-toggler {
+	background-color: 	rgb(255,255,255)	!important
+}
+
+.ui-layout-toggler-north-open {
+	background-image: 	url(../images/toggler-north-south-2.png) !important
+}
+.ui-layout-toggler-north-closed {
+	background-image: 	url(../images/toggler-north-south-1.png) !important
+}
+
+.ui-layout-toggler-west-open {
+	background-image: 	url(../images/toggler-west-east-1.png) !important
+}
+.ui-layout-toggler-west-closed {
+	background-image: 	url(../images/toggler-west-east-2.png) !important
+}
+
+.ui-layout-toggler-east-open {
+	background-image: 	url(../images/toggler-west-east-2.png) !important
+}
+
+.ui-layout-toggler-east-closed {
+	background-image: 	url(../images/toggler-west-east-1.png) !important
+}
+
+.ui-layout-toggler-south-open {
+	background-image: 	url(../images/toggler-north-south-1.png) !important
+}
+.ui-layout-toggler-south-closed {
+	background-image: 	url(../images/toggler-north-south-2.png) !important
+}
+
+.ui-layout-north, .ui-layout-center, .ui-layout-south {
+        padding: 		0 			!important;
+}
+
+.ui-layout-north, .ui-layout-east, .ui-layout-south, .ui-layout-west {
+ 	background-color: 	rgb(255,255,255) 	!important;
+}
+
+.olControlLayerSwitcher {
+	opacity:		0.7;
+	filter:			alpha(opacity=80);	/* IE */
+}
+
+.olControlLayerSwitcher .layersDiv {
+    	background-color: 	#6B6			!important;
+}
+
+.left  {
+	float:			left;
+	margin-right:		10px;
+} 
+
+.olPopup {				
+	opacity:		0.7; 			/* ff, opera, gnome */ 
+        filter:			alpha(opacity=80);	/* IE */
+	-moz-opacity:		0.7;			/* older ff */
+        -khtml-opacity:		0.7;
+}
+
+/* .olTileImage { 
+	filter:			url('../images/desaturate.svg#greyscale'); 
+	-webkit-filter: 	grayscale(100%);
+	-moz-filter: 		grayscale(100%);
+	filter: 		grayscale(100%); 
+        filter:			gray;			
+}
+*/
+
+/* ************ HEADER *************** */
+
+
+#title_div {        
+        font-weight:		bold;
+        font-size:		1.5em;
+        float:			left;
+        width:			450px;	
+	margin:			0px 5px 0px 5px;
+/*      border:			1px solid #00f; */
+}
+
+#search_div {
+	float:			right;
+        width:			310px;
+	margin:			0px 5px 0px 5px;        
+/*      border:			1px solid #00f; */ 
+}
+
+.searchBox {
+   	width: 			230px;
+}
+
+.ui-slider-handle { 
+	width:			.8em 	!important; 
+	height: 		.8em 	!important;
+}
+
+#slider_div {
+	margin-top: 		5px;
+	width: 			310px; 
+	height:			.5em;
+/*	border:			1px solid #00f; */ 
+}
+
+#oauth_div {
+	float:			right;
+        margin:			0px 5px 0px 5px;
+/*      border:			1px solid #00f; */ 
+}
+
+#loader_div {
+        float:			right;
+        width:			0px;  /* wird dynamisch gesetzt */ 
+        height:			32px;
+        background-image:	url(../images/lupe32.gif);       
+/*      border:			1px solid #00f; */
+}
+
+/* ******************************** MAP ********************** */
+
+
+.olControlAttribution {
+	bottom: 		0.5em	!important;
+        background-color: 	#ffffff;
+}
+
+.button.b-close, .button.bClose {
+    border-radius: 7px 7px 7px 7px;
+    box-shadow: none;
+    font: bold 131% sans-serif;
+    padding: 0 6px 2px;
+    position: absolute;
+    right: -7px;
+    top: -7px;
+}
+
+.olControlEditingToolbar  {
+	width: 		58px;
+}
+
+.olControlDrawFeaturePointItemInactive,
+.olControlDrawFeaturePathItemInactive   {
+	display:	none;			
+}
+
+/*
+.olImageLoadError {                                                                                                  
+         background-image: url('/path/to/theme/img/my-tile-load-error.png');
+         background-repeat: no-repeat;
+} 
+*/
+
+/* ******************************************************************** */
+
+#panelBox {
+	margin-top: 10px;
+	margin-bottom: 10px;
+        height:84px;
+     /* border:1px solid #f00; */ 
+}
+
+.editPanel div {
+      width:  32px;
+      height: 32px;
+      margin-left: 10px;
+      margin-bottom: 10px;
+      border: thin solid black;
+      float:left;
+ 
+}
+
+.olControlNavigationItemActive		{background-image: url("../images/applications-internet_on.png");}
+.olControlNavigationItemInactive	{background-image: url("../images/applications-internet_off.png");}
+.lineButtonItemActive			{background-image: url("../images/insert_horizontal_rule_on.png");}
+.lineButtonItemInactive			{background-image: url("../images/insert_horizontal_rule_off.png");}
+.pointButtonItemActive			{background-position: 0px -23px; }
+.pointButtonItemInactive		{background-position: 0px 0px; }
+.polygonButtonItemActive		{background-image: url("../images/draw-polygon_on.png");}
+.polygonButtonItemInactive		{background-image: url("../images/draw-polygon_off.png");}
+.polylineButtonItemActive		{background-image: url("../images/draw-polyline_on.png");}
+.polylineButtonItemInactive		{background-image: url("../images/draw-polyline_off.png");}
+.boxButtonItemActive			{background-image: url("../images/draw-rectangle_on.png");}
+.boxButtonItemInactive			{background-image: url("../images/draw-rectangle_off.png");}
+/* box qgis-grass-modules-v.in.region.1 */
+.olControlModifyFeatureItemActive	{background-image: url("../images/edit-select_on.png");}
+.olControlModifyFeatureItemInactive	{background-image: url("../images/edit-select_off.png");}
+.olControlDragFeatureItemActive		{background-image: url("../images/transform-move_on.png");}
+.olControlDragFeatureItemInactive	{background-image: url("../images/transform-move_off.png");}
+.olControlDeleteFeatureItemActive	{background-image: url("../images/edit-delete_on.png");}
+.olControlDeleteFeatureItemInactive 	{background-image: url("../images/edit-delete_off.png");}
+.olControlSplitItemActive		{background-position: 0px -347px; }
+.olControlSplitItemInactive		{background-position: 0px -322px; }
+.editButtonItemActive			{background-position: 0px -115px; }
+.editButtonItemInactive			{background-position: 0px -92px; }
+.saveButtonItemActive			{background-image: url("../images/document-save_on.png");}
+.saveButtonItemInactive			{background-image: url("../images/document-save_off.png");}
+
+/* ******************************************************************** */
+
+.counters {
+	text-align:	right;
+}
+
+/* Content der Popups */
+
+.popup_div {
+	font-size:		1em;
+}
+.popup_header {
+	font-size:		1.2em;
+	font-weight:		bold;
+        margin-bottom:		5px;	
+}
+.popup_header_left {
+        width:			17em;
+/*	border:1px solid #f00; */   
+}
+
+.popup_header_right { 
+	float:			right;
+        font-size:		1.4em;
+}
+
+.popup_col1 p {       
+	margin:			0px 20px 0px 5px;
+}
+
+.popup_col2 p {       
+	margin:			0px 5px 0px 5px;
+}
+
+.popup_row {
+        float:left;
+        margin-bottom:		2px;
+/*      border:			1px solid #f00; */
+}
+
+.popup_row_left {
+	width:			6em;
+        float:			left;
+        overflow:		auto;
+/*      border:			1px solid #0f0; */
+}
+
+.popup_row_right {        
+/*	border:			1px solid #00f; */
+}
+
+.popup_footer {
+        height:			2em;
+/*      border:			1px solid #f00; */
+}
+
+.popup_footer_left {
+	margin-top:		3px;
+	float:			left;
+/*      border:			1px solid #0f0; */
+}
+
+.popup_footer_right {
+	float:			right;
+	margin-left:		5px;
+/*      border:			1px solid #00f; */
+}
+
+#lag_div, 
+#zoom_div, 
+#bbox_div, 
+#mouse_div, 
+#permalink_div,
+#legend {
+        float: right;
+        margin-top: 2px;
+        margin-left: 5px;
+        margin-right: 5px;
+	font-size: small;
+	text-decoration: none;
+/*      border:	1px solid #f00;  */
+}

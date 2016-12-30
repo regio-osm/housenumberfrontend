@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<meta name="description" lang="de" content="OpenStreetMap Hausnummerauswertung zur Qualitätssicherung" />
+		<meta name="keywords" lang="de" content="OpenStreetMap, OSM, Hausnummerauswertung, Adressen, Qualitätssicherung" /> 
+		<link rel="stylesheet" href="/housenumbers/css/normalize.css" />
+		<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" href="/housenumbers/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="/housenumbers/css/hausnummern.css"/>
+		<title>OpenStreetMap Hausnummerauswertung</title>
+	</head>
+	<body>
+		<div id="headerLogo" class="clearfix">
+			<div class="logo" ><img src="/housenumbers/img/logo-small.png" alt="hausnummerauswertunglogo"/></div>
+			<h1><a href="/housenumbers" >Hausnummernauswertung auf regio-osm.de</a></h1>
+			<h2>Statische Auswertungen für OpenStreetMap</h2>
+		</div>
+		<table>
+		<tr>
+		<td width="75%" valign="top">
+		<h3>Einleitung</h3>
+		<p>Die OSM-Hausnummerauswertung verwendet offizielle Hausnummerlisten von Gemeinden und stellt fest, welche Hausnummern davon bereits in OSM erfasst sind und welche noch fehlen.</p>
+		<p>Die Listen wurden von einzelnen Mappern angefragt und an den Betreiber dieser Website per <a href="/housenumbers/kontakt.html">Mail</a> weitergeleitet oder die Listen wurden als OpenData Datensätze im Internet gefunden</p>
+		<h3>Auswertungsarten und -zyklus</h3>
+		<p>Die Ergebnisse sind in</p>
+		<p><a href="/housenumbers/selectmunicipality">tabellarischer Form</a> zur Analyse von Details und Hilfsmittel zur Erfassung der noch fehlenden Hausnummern und in</p>
+		<p>einer Kartendarstellung <a href="/housenumbers/anzeige_dynamisch.html">weltweit</a> oder <a href="/housenumbers/karte_auswahlort">nach Auswahl</a> verfügbar</p>
+		<p><a href="/housenumbers/theretischeabdeckung.html">monatliche Sonderauswertung theoretische Hausnummernabdeckung in Deutschland</a></p>
+		<h3>Auswertungszyklus der einzelnen Städte/Gemeinden</h3>
+		<p>Alle Städte und Gemeinden werden zweimal in der Woche ausgewertet (ausgenommen Niederland nur einmal).</p>
+		<p>Der Zeitablauf für jede einzelne Gemeinde ist auf der Seite <a href='/housenumbers/nextopenjobs'>Zeitablauf</a> zu finden.</p>
+		<p><b>Neuerung ab 10.04.2016: </b>Die Zeiten wurden korrigiert, damit eine gleichmäßige Belastung des Servers erreicht wird.</p>
+		<p>Die Zeiten auf dieser Seite stellen die großräumige Zeiteinteilung dar.</p>
+		<p>Die Zeitangaben geben den geplanten Anfang und das erfahrungsgemäße Ende der Auswertungen an und sind in MESZ bzw. MEZ angegeben.</p>
+      <p><b>The Schedules for all Evaluations are new calculated new from 10th of April on.</b> The estimated times are rougly calculated and can vary. Timezone is CET</p>
+		<p><b></b></p>
+		<h4>Timeline in Overview - Zeitlicher Verlauf in Übersicht</h4>
+		<table border="all">
+		<thead><tr>
+			<th>Day of week<br/>Wochentag</th>
+			<th>Country<br/>Land</th>
+			<th>Start of Evaluation<br/>Beginn Auswertung</br></th>
+			<th>estimated End of Evaluation<br/>erwartetes Ende Auswertung</th>
+		</tr></thead>
+		<tbody>
+			<tr><td colspan="4">Monday / Montag</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Romania">Romania</a></td><td>00:02h</td><td>00:05h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Deutschland">Germany</a></td><td>00:04h</td><td>07:00h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Iceland">Iceland</a></td><td>06:45h</td><td>07:15h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Luxembourg">Luxembourg</a></td><td>07:00h</td><td>07:30h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Italia">Italia</a></td><td>07:30h</td><td>08:30h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Schweiz">Switzerland</a></td><td>08:15h</td><td>11:00h</td></tr>
+			<tr><td colspan="4">Tuesday<br/>Dienstag</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Österreich">Austria</a></td><td>00:04h</td><td>04:00h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Belgium">Belgium</a></td><td>04:00h</td><td>08:30h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Estonia">Estonia</a>&nbsp;&nbsp;<b>new</b></td><td>08:30h</td><td>12:30h</td></tr>
+			<tr><td colspan="4">Wednesday<br/>Mittwoch</td></tr>
+			<tr><td>&nbsp;</td><td colspan="3">no housenumber evaluations</td></tr>
+			<tr><td colspan="4">Thursday<br/>Donnerstag</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Romania">Romania</a></td><td>00:02h</td><td>00:05h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Deutschland">Germany</a></td><td>00:04h</td><td>07:00h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Iceland">Iceland</a></td><td>06:45h</td><td>07:15h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Luxembourg">Luxembourg</a>&nbsp;&nbsp;<b>new</b></td><td>07:00h</td><td>07:30h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Italia">Italia</a></td><td>07:30h</td><td>08:30h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Schweiz">Switzerland</a></td><td>08:15h</td><td>11:00h</td></tr>
+			<tr><td colspan="4">Friday / Freitag</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Österreich">Austria</a></td><td>00:04h</td><td>04:00h</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Belgium">Belgium</a></td><td>04:00h</td><td>08:30h</td></tr>
+			<tr><td colspan="4">Saturday<br/>Samstag</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Netherland">Netherland</a></td><td>00:04h</td><td>19:00h ???</td></tr>
+			<tr><td colspan="4">Sunday<br/>Sonntag</td></tr>
+			<tr><td>&nbsp;</td><td><a href="#Poland">Poland</a>&nbsp;&nbsp;<b>new</b></td><td>00:04h</td><td>17:00h ???</td></tr>
+		</tbody>
+		</table>
+		<h4>Räumlicher Verlauf im Detail</h4>
+		<h5><a name="Belgium"></a>Belgium</h5>
+		<p>The evaluations run on Tuesday and Friday</p>
+		<table border="all">
+		<thead><tr><th>Provincie</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>-</td><td>04:15h</td><td>04:30h</td></tr>
+			<tr><td>Antwerpen</td><td>04:30h</td><td>05:15h</td></tr>
+			<tr><td>Limburg</td><td>05:15h</td><td>05:30</td></tr>
+			<tr><td>Oost-Vlaanderen</td><td>05:30h</td><td>06:15h</td></tr>
+			<tr><td>Vlaams-Brabant</td><td>06:15h</td><td>07:30h</td></tr>
+			<tr><td>West-Vlaanderen</td><td>07:30h</td><td>08:30h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Deutschland"></a>Deutschland</h5>
+		<p>Die Auswertungen laufen am Montag und Donnerstag</p>
+		<table border="all">
+		<thead><tr><th>Bundesland</th><th>Unterbereich</th><th>Beginn Auswertung</th><th>ca. Ende Auswertung</th></tr></thead>
+		<tbody>
+			<tr><td>Baden-Württemberg</td><td>*</td><td>00:04h</td><td>00:20h</td></tr>
+			<tr><td>Bayern</td><td>*</td><td>00:15h</td><td>01:00h</td></tr>
+			<tr><td>Berlin</td><td>*</td><td>01:00h</td><td>01:30h</td></tr>
+			<tr><td>Brandenburg</td><td>*</td><td>01:30h</td><td>01:35h</td></tr>
+			<tr><td>Bremen</td><td>*</td><td>01:35h</td><td>01:50h</td></tr>
+			<tr><td>Hamburg</td><td>*</td><td>02:00h</td><td>02:25h</td></tr>
+			<tr><td>Hessen</td><td>*</td><td>02:30h</td><td>02:45h</td></tr>
+			<tr><td>Mecklenburg-Vorpommern</td><td>*</td><td>02:45h</td><td>03:15h</td></tr>
+			<tr><td>Niedersachsen</td><td>*</td><td>03:15h</td><td>03:20h</td></tr>
+			<tr><td>Nordrhein-Westfalen</td><td>RB Arnsberg</td><td>03:20h</td><td>03:30h</td></tr>
+			<tr><td></td><td>RB Detmold</td><td>03:30h</td><td>03:40h</td></tr>
+			<tr><td></td><td>RB Düsseldorf</td><td>03:40h</td><td>04:10h</td></tr>
+			<tr><td></td><td>RB Köln</td><td>04:10h</td><td>04:30h</td></tr>
+			<tr><td></td><td>RB Münster</td><td>04:30h</td><td>04:45h</td></tr>
+			<tr><td>Sachsen</td><td>*</td><td>04:45h</td><td>06:15h</td></tr>
+			<tr><td>Thüringen</td><td>*</td><td>06:15h</td><td>06:30h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Estonia"></a>Estonia</h5>
+		<p>The evaluations run on Tuesday</p>
+		<table border="all">
+		<thead><tr><th>Provincie</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>Harju maakond</td><td>08:30h</td><td>08:45h ???</td></tr>
+			<tr><td>Hiiu maakond</td><td>08:45h</td><td>09:00h ???</td></tr>
+			<tr><td>Ida-Viru maakond</td><td>09:00h</td><td>09:15h ???</td></tr>
+			<tr><td>Järva maakond</td><td>09:15h</td><td>09:30h ???</td></tr>
+			<tr><td>Jõgeva maakond</td><td>09:30h</td><td>09:45h ???</td></tr>
+			<tr><td>Lääne maakond</td><td>09:45h</td><td>10:00h ???</td></tr>
+			<tr><td>Lääne-Viru maakond</td><td>10:00h</td><td>10:15h ???</td></tr>
+			<tr><td>Pärnu maakond</td><td>10:15h</td><td>10:30h ???</td></tr>
+			<tr><td>Põlva maakond</td><td>10:30h</td><td>10:45h ???</td></tr>
+			<tr><td>Rapla maakond</td><td>10:45h</td><td>11:00h ???</td></tr>
+			<tr><td>Saare maakond</td><td>11:00h</td><td>11:15h ???</td></tr>
+			<tr><td>Tartu maakond</td><td>11:15h</td><td>11:30h ???</td></tr>
+			<tr><td>Valga maakond</td><td>11:30h</td><td>11:45h ???</td></tr>
+			<tr><td>Viljandi maakond</td><td>11:45h</td><td>12:00h ???</td></tr>
+			<tr><td>Võru maakond</td><td>12:00h</td><td>12:15h ???</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Iceland"></a>Iceland</h5>
+		<p>The evaluations run on Monday and Thursday</p>
+		<table border="all">
+		<thead><tr><th>Area</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>*</td><td>06:45h</td><td>07:00h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Italia"></a>Italia</h5>
+		<p>The evaluations run on Monday and Thursday</p>
+		<table border="all">
+		<thead><tr><th>Region</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>Emilia-Romagna</td><td>07:25h</td><td>07:30h</td></tr>
+			<tr><td>Friuli–Venezia Giulia</td><td>07:30h</td><td>07:35h</td></tr>
+			<tr><td>Tuscany</td><td>07:35h</td><td>07:40h</td></tr>
+			<tr><td>Lombardia</td><td>07:40h</td><td>07:45h</td></tr>
+			<tr><td>Trentino-Alto Adige</td><td>07:45h</td><td>07:55h</td></tr>
+			<tr><td>Trentino-Südtirol</td><td>07:55h</td><td>08:10h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Luxembourg"></a>Luxembourg</h5>
+		<p>The evaluations run on Monday and Thursday</p>
+		<table border="all">
+		<thead><tr><th>Area</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>*</td><td>07:00h</td><td>07:30h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Netherland"></a>Netherland</h5>
+		<p>The evaluations run on Saturday</p>
+		<table border="all">
+		<thead><tr><th>Province</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>Groningen</td><td>00:02h</td><td>00:50h</td></tr>
+			<tr><td>Friesland</td><td>00:50h</td><td>01:50h</td></tr>
+			<tr><td>Drenthe</td><td>01:50h</td><td>02:25h</td></tr>
+			<tr><td>Noord-Holland</td><td>02:25h</td><td>06:25h</td></tr>
+			<tr><td>Flevoland</td><td>06:25h</td><td>07:40h</td></tr>
+			<tr><td>Overijssel</td><td>07:40h</td><td>09:20h</td></tr>
+			<tr><td>Zuid-Holland</td><td>09:20h</td><td>11:40h</td></tr>
+			<tr><td>Utrecht</td><td>11:40h</td><td>14:20h ???</td></tr>
+			<tr><td>Gelderland</td><td>14:20h</td><td>17:00h ???</td></tr>
+			<tr><td>Zeeland</td><td>17:00h</td><td>18:10h ???</td></tr>
+			<tr><td>Noord-Brabant</td><td>18:10h</td><td>18:50h ???</td></tr>
+			<tr><td>Limburg</td><td>18:50h</td><td>21:00h ???</td></tr>
+		</tbody>
+		</table>
+		<h5>Österreich</h5>
+		<p>Die Auswertungen laufen Dienstag und Freitag</p>
+		<table border="all">
+		<thead><tr><th>Bundesland</th><th>Beginn Auswertung</th><th>erwartetes Ende Auswertung</th></tr></thead>
+		<tbody>
+			<tr><td>Burgenland</td><td>00:02h</td><td>00:30h</td></tr>
+			<tr><td>Kärnten</td><td>00:30h</td><td>00:45h</td></tr>
+			<tr><td>Niederösterreich</td><td>00:45h</td><td>01:30h</td></tr>
+			<tr><td>Oberösterreich</td><td>01:30h</td><td>02:15h</td></tr>
+			<tr><td>Salzburg</td><td>02:15h</td><td>02:35h</td></tr>
+			<tr><td>Steiermark</td><td>02:35h</td><td>03:05h</td></tr>
+			<tr><td>Tirol</td><td>03:05h</td><td>03:25h</td></tr>
+			<tr><td>Vorarlberg</td><td>03:25h</td><td>03:45h</td></tr>
+			<tr><td>Wien</td><td>03:45h</td><td>04:00h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Poland"></a>Poland</h5>
+		<p>The evaluations run on Sunday</p>
+		<table border="all">
+		<thead><tr><th>województwo (Province)</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>zachodniopomorskie</td><td>00:02h</td><td>00:35h ???</td></tr>
+			<tr><td>pomorskie</td><td>00:35h</td><td>01:15h ???</td></tr>
+			<tr><td>warmińsko-mazurskie</td><td>01:15h</td><td>01:45h ???</td></tr>
+			<tr><td>podlaskie</td><td>01:45h</td><td>02:10h ???</td></tr>
+			<tr><td>mazowieckie</td><td>02:10h</td><td>04:10h ???</td></tr>
+			<tr><td>kujawsko-pomorskie</td><td>04:10h</td><td>05:10h ???</td></tr>
+			<tr><td>wielkopolskie</td><td>05:10h</td><td>06:30h ???</td></tr>
+			<tr><td>lubuskie</td><td>06:30h</td><td>07:000h ???</td></tr>
+			<tr><td>dolnoslaskie</td><td>07:00h</td><td>09:00h</td></tr>
+			<tr><td>łódzkie</td><td>09:00h</td><td>11:00h ???</td></tr>
+			<tr><td>lubelskie</td><td>11:00h</td><td>13:00h ???</td></tr>
+			<tr><td>świętokrzyskie</td><td>13:00h</td><td>14:10h ???</td></tr>
+			<tr><td>opolskie</td><td>14:10h</td><td>15:00h ???</td></tr>
+			<tr><td>śląskie</td><td>15:00h</td><td>16:00h ???</td></tr>
+			<tr><td>małopolskie</td><td>16:00h</td><td>20:00h ???</td></tr>
+			<tr><td>podkarpackie</td><td>20:00h</td><td>22:30h ???</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Romania"></a>Romania</h5>
+		<p>The evaluations run Monday and Thursday</p>
+		<table border="all">
+		<thead><tr><th>Area</th><th>Start of Evaluation</th><th>estimated End of Evaluation</th></tr></thead>
+		<tbody>
+			<tr><td>*</td><td>00:02h</td><td>00:04h</td></tr>
+		</tbody>
+		</table>
+		<h5><a name="Schweiz"></a>Schweiz</h5>
+		<p>Die Auswertungen laufen Montag und Donnerstag</p>
+		<table border="all">
+		<thead><tr><th>Kanton</th><th>Beginn Auswertung</th><th>erwartetes Ende Auswertung</th></tr></thead>
+		<tbody>
+			<tr><td>Basel-Land</td><td>08:10h</td><td>08:20h</td></tr>
+			<tr><td>Basel-Stadt</td><td>08:20h</td><td>08:25h</td></tr>
+			<tr><td>Bern</td><td>08:25h</td><td>09:30h</td></tr>
+			<tr><td>Genf</td><td>09:30h</td><td>09:45h</td></tr>
+			<tr><td>Glarus</td><td>09:45h</td><td>09:50h</td></tr>
+			<tr><td>Schaffhausen</td><td>09:50h</td><td>10:00h</td></tr>
+			<tr><td>Schwyz</td><td>10:00h</td><td>10:10h</td></tr>
+			<tr><td>Solothurn</td><td>10:10h</td><td>10:30h</td></tr>
+			<tr><td>Uri</td><td>10:30h</td><td>10:35h</td></tr>
+			<tr><td>Vaud</td><td>10:35h</td><td>10:40h</td></tr>
+			<tr><td>Zürich</td><td>10:40h</td><td>11:00h</td></tr>
+		</tbody>
+		</table>
+		<p></p>
+		<h3>Verwaltung der Hausnummernlisten</h3>
+		<p>Die Listen werden von mir zentral importiert. Wenn Du eine neue Hausnummerliste einer Stadt oder Gemeinde hast oder zu einer vorhandenen Liste ein Update bekommen hast, schick mir diese Liste an strassenliste@diesei.de</p>
+		<hr />
+		<p><a href="/housenumbers/kontakt.html">Kontakt</a>&nbsp;
+			|&nbsp;<a href="/housenumbers/quellenangaben.html">Quellenangaben</a>
+			|&nbsp;<a href="/housenumbers/mitwirkende.html">Mitwirkende</a>
+			|&nbsp;<a href="/housenumbers/impressum.html">Impressum</a>
+		</p>
+		</td>     <!-- end of main column -->
+		<td width="25%" valign='top'>  <!-- start of news column -->
+		<table width="100%">
+			<tr><td>
+            <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/search?q=from%3Aregio_osm%20%23Hausnummerauswertung" data-widget-id="607474057701924864">Tweets über from:regio_osm #Hausnummerauswertung </a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+			</td></tr>
+		</table>
+		<h3>ältere Nachrichten</h3>
+		<table width="100%">
+		<tr><td><p><b>04.03.2015 20:30h</b><br />Neue Auswertungszeiten, ab jetzt alle Auswertungen wieder 2mal in der Woche</p></td></tr>
+		<tr><td><p><b>18.10.2014 15:40h</b><br />Vor einigen Tagen sind die Hamburg und Frankfurt am Main hinzugekommen, dank der Open Data Portale der beiden Städte</p></td></tr>
+		<tr><td><p><b>27.09.2014 12:35h</b><br />Die Auswertungen laufen ab heute wieder turnusgemäß</p></td></tr>
+		<tr><td><p><b>24.09.2014 08:10h</b><br />die lokale OSM-DB wird neu aufgebaut, die heute und morgen geplanten Hausnummerauswertungen entfallen. Vorauss. ab Freitag wieder Normalbetrieb</p></td></tr>
+		<tr><td><p><b>02.09.2014 11:22h</b><br />Ebenfalls im August kam mit der Gemeinde <a href="/housenumbers/auswertung_auswahldetails?land=Bundesrepublik%20Deutschland&amp;stadt=Wagenfeld">Wagenfeld</a> die erste Gemeinde Niedersachsens dazu</p></td></tr>
+		<tr><td><p><b>02.09.2014 11:21h</b><br />Im August kam mit der Gemeinde <a href="/housenumbers/auswertung_auswahldetails?land=Bundesrepublik%20Deutschland&amp;stadt=Altenburg">Altenburg</a> die erste Gemeinde Thüringens dazu</p></td></tr>
+		<tr><td><p><b>02.09.2014 11:20h</b><br />Aktualisierung der Auswertezeiten und Ergänzun etlicher neuer Gemeinden (nur neu auf dieser Übersichtsseite)</p></td></tr>
+		<tr><td><p><b>27.06.2014 13:30</b><br />Am jetzt gibt es für alle Gemeinden Islands Hausnummerauswertungen</p></td></tr>
+		<tr><td><p><b>20.06.2014 23:10h</b><br />Am morgen (Sa) laufen die Auswertungen wieder normal</p></td></tr>
+		<tr><td><p><b>10.06.2014 20:05h</b><br /><a href="/housenumbers/theretischeabdeckung.html">Sonderauswertung theoretische Abdeckung</a></p></td></tr>
+		<tr><td><p><b>10.06.2014 20:00h</b><br />Auswertungsprobleme vom 3.6. bis 9.6.2014 - in diesem Zeitraum wurden Hausnummernbereiche, z.b. 9-15, nicht aufgelöst, also nur 9 und 15 gezählt. Ab 9.6. Problem beseitigt</p></td></tr>
+		<tr><td><p><b>02.06.2014</b><br />Die Auswertezeiten wurden angesichts der Listen im Landkreis Mettmann angepasst</p></td></tr>
+		<tr><td><p><b>20.05.2014</b><br />Alle Auswertungen laufen ab jetzt 2mal in der Woche, der vorherige Zyklus verursachte zuviel Last auf dem Server</p></td></tr>
+		<tr><td><p><b>15.05.2014</b><br />Die Endezeiten der Auswertungen wurden angepasst, die neuen Auswertungen für Erkrath und Münster wurden ergänzt</p></td></tr>
+		<tr><td><p><b>26.04.2014</b><br />Heute und morgen entfallen alle Straßenlisten- und Hausnummerauswertungen, weil die lokale DB neu erstellt wird</p></td></tr>
+		<tr><td><p><b>19.02.2014 06:10h</b><br />Seit gestern abend gibt es die erste Auswertung für <a href="/housenumbers/auswertung_auswahldetails?stadt=Troisdorf&amp;land=Bundesrepublik+Deutschland">Troisdorf</a></p></td></tr>
+		<tr><td><p><b>13.02.2014 23:15h</b><br />Aktuell läuft die Berlin-Auswertung noch, ab Freitag wieder normaler Betrieb</p></td></tr>
+		<tr><td><p><b>12.02.2014 8:25h</b><br />Auswertungen pausieren wg. Neuaufbau lokale OSM-DB. Vorauss. ab Samstag wieder Auswertungen</p></td></tr>
+		<tr><td><p><b>10.02.2014 10:15h</b><br />Ab jetzt Auswertungen alle 2 Tage und neue Zeiten (Grund: Zugang Berlin)</p></td></tr>
+		<tr><td><p><b>06.02.2014 12:15h</b><br />Seit gestern abend gibt es die erste <a href="/housenumbers/auswertung_auswahldetails?stadt=Berlin&amp;land=Bundesrepublik+Deutschland">Berlin-Auswertung</a></p></td></tr>
+		<tr><td><p><b>04.02.2014 23:35h</b><br />Für Berlin soll morgen die erste Auswertung erstellt werden</p></td></tr>
+		<tr><td><p><b>25.01.2014 07:45h</b><br />Die Auswertungen wurden am 23. und 24.1. unvollständig/nicht aktualisiert, ab heute geht es wieder</p></td></tr>
+		<tr><td><p><b>22.01.2014 20:00h</b><br />Für Dresden ist die erste Auswertung verfügbar</p></td></tr>
+		<tr><td><p><b>08.01.2014 08:25h</b><br />zeitliche Abfolge der Auswertungen geändert (Große, aktive Städte abends früher fertig)</p></td></tr>
+		<tr><td><p><b>02.01.2014 19:05h</b><br />Alle Auswertungen laufen jetzt täglich</p></td></tr>
+		<tr><td><p><b>03.12.2013 07:45h</b><br />Die Hausnummernauswertungen gibt es seit gestern wieder</p></td></tr>
+		<tr><td><p><b>28.11.2013 09:06h</b><br />Die lokake OSM-DB ist mehr als 24h veraltet und lässt sich nicht mehr synchronisieren, daher entfallen seit gestern Auswertungen und ab heute wird eine neue DB erstellt. Auswertungen vorauss. wieder ab Sonntag oder Montag.</p></td></tr>
+		<tr><td><p><b>20.11.2013 18:25h</b><br />In den Tabellenauswertungen ist unterhalb des Titels ein Link vorhanden, um eine GPX-Datei mit den fehlenden Hausnummern herunterzuladen</p></td></tr>
+		<tr><td><p><b>18.11.2013 18:25h</b><br />Heute sind leider alle Auswertungen entfallen, ab morgen wieder Normalbetrieb</p></td></tr>
+		<tr><td><p><b>16.11.2013</b><br />Morgen, Sonntag entfallen Auswertungen Bremen und München, dafür wird Köln mehrfach ausgewertet</p></td></tr>
+		<tr><td><p><b>05.11.2013</b><br />Heute und evtl. morgen laufen keine Hausnummernauswertungen wegen eines zusätzlichen DB-Imports</p></td></tr>
+		<tr><td><p><b>29.09.2013 09:50h</b><br />Die Auswertungen laufen seit heute wieder im normalen Zyklus</p></td></tr>
+		<tr><td><p><b>27.09.2013 10:54h</b><br />In der lokalen DB fehlen evtl. einzelne Daten seit Anfang der Woche. Daher werden vorerst keine weiteren Auswertungen durchgeführt und eine neue lokale DB aufgebaut. Nächste Auswertungen ab Montag oder Dienstag</p></td></tr>
+		<tr><td><p><b>17.09.2013 11:09h</b><br />In Köln und Bremen sind die Stadtbezirksauswertungen nicht mehr auswählbar, weil deren Auswertungen noch nicht gehen</p></td></tr>
+		<tr><td><p><b>17.09.2013</b><br />Die Auswertungen der Großstädte laufen ab morgen 2tägig, siehe links neuer Zyklus</p></td></tr>
+		<tr><td><p><b>17.09.2013 09:50h</b><br />Die Auswertungs-DB ist noch 36h verzögert, heute laufen erstmal alle Stadtauswertungen.	</p></td></tr>
+		<tr><td><p><b>15.09.2013</b><br />Die Aktualisierung der Auswertungs-DB ist um etwa 72h verzögert, daher sind die Auswertungen entsprechend nicht aktuell</p></td></tr>
+		</table>
+		</td>     <!-- end of news column-->
+		</tr>     <!-- end of first-only row of page wide table -->
+		</table>  <!-- Page table 2column-->
+</body>
+</html> 
+
+
+
+
+

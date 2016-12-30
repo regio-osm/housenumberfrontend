@@ -1,0 +1,10 @@
+/* http://colorbrewer2.org/ diverging 7colors: fifth entry: from red over white to blue */
+.abdeck_100 { background-color:			#2166AC; }
+.abdeck_95 { background-color:			#67A9CF; }
+.abdeck_85 { background-color:			#D1E5F0; }
+.abdeck_75 { background-color:			#F7F7F7; }
+.abdeck_50 { background-color:			#FDDBC7; }
+.abdeck_25 { background-color:			#EF8A62; }
+.abdeck_0 { background-color:			#B2182B; }
+.abdeck_invalid { background-color:		#666666; }
+

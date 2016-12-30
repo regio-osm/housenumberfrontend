@@ -1,0 +1,92 @@
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{ __("select a municipality to see the evaluation") }}{% endblock %}
+	
+{% block headerscripts %}
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+	<script type="text/javascript" src="/housenumbers/js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/jquery-ui-1.11.2.min.js"></script>
+	<script type="text/javascript">
+		// jquery horizontal areas
+		$(function() {
+			$( ".accordion" ).accordion({
+				active:			false,
+				collapsible:	true,
+				header: 			'h4'
+		    });
+			});
+		
+		$(function() {
+		    var availableTags = [
+		         			{%- for country in countries -%}
+	         					{%- for subcountry in country.subcountries -%}
+	         						{%- if subcountry.name -%}{ value: "{{ country.namenormalized }}{{ subcountry.namenormalized }}", label: "{{ subcountry.name }}" },
+	         						{%- endif -%}
+	         						{%- for stadt in subcountry.entries -%}
+		         						{%- if stadt.name -%}{ value: "{{ country.namenormalized }}{{ subcountry.namenormalized }}{{ stadt.namenormalized }}", label: "{{ stadt.name }}" },{%- endif -%}
+	         						{%- endfor -%}
+	         					{%- endfor -%}
+	         				{%- endfor -%}
+                         ];
+
+    $( "#tags" ).autocomplete({
+      source: availableTags, 
+      select: function( event, ui ) {
+    	  console.log(ui.item.value);
+    	  var destinationelementname = '#' + ui.item.value;
+    	  var destinationelement = $(destinationelementname)[0];
+    	  console.log("destinationelement.role ===" + destinationelement.role + "===");
+    	  if(		(destinationelement.tagName != undefined) 
+    		  &&	(destinationelement.tagName != "DIV")) {
+    		  destinationelement = destinationelement.parentNode;
+        	  console.log("destinationelement.role ===" + destinationelement.role + "===");
+    	  }
+    	  if(		(destinationelement.tagName != undefined)
+        	  &&	(destinationelement.tagName != "DIV")) {
+    		  destinationelement = destinationelement.parentNode;
+        	  console.log("destinationelement.role ===" + destinationelement.role + "===");
+    	  }
+    	  if(destinationelement.tagName == "DIV") {
+    		  $(destinationelement).removeAttr( "style" ).hide().fadeIn();
+        	  console.log("destinationelement.role ===" + destinationelement.role + "===");
+    	  }
+    	  var destinationelementname = '#' + ui.item.value;
+    	  var destinationelement = $(destinationelementname)[0];
+    	  $('html, body').animate({
+    	        scrollTop: $(destinationelement).offset().top}, 0);
+    	  
+    	}
+    });
+
+	});
+
+	</script>
+{% endblock %}
+
+{% block content %}
+
+
+   {{ __("links to start of each country") }}&nbsp;
+	{%- for country in countries -%}
+			<a href="#header{{ country.namenormalized }}">{{ country.name }}</a>&nbsp;
+	{%- endfor -%}
+	<div class="ui-widget">
+	  <label for="tags">{{ __("direct search") }}</label>
+	  <input id="tags">
+	</div>
+
+
+	{%- for country in countries -%}
+		<h3 id="header{{ country.namenormalized }}">{{ country.name }}</h3> <!--  <a name="{{ country.name }}"> </a> -->
+			<div id="{{ country.namenormalized }}" class="accordion">
+		{%- for subcountry in country.subcountries -%}
+			<h4>{{ subcountry.name }}</h4>
+			<div id="{{ country.namenormalized }}{{ subcountry.namenormalized }}">
+			{%- for stadt in subcountry.entries -%}
+				<p id="{{ country.namenormalized }}{{ subcountry.namenormalized }}{{ stadt.namenormalized }}"><a href="/housenumbers/selectevaluation?country={{ country.countrycode }}&municipality={{ stadt.name }}">{{ stadt.name }}</a></p>
+			{%- endfor -%}
+			</div>
+		{%- endfor -%}
+			</div>
+	{%- endfor -%}
+{% endblock %}

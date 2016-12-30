@@ -1,0 +1,10 @@
+/* http://colorbrewer2.org/ sequential, 7 colors: fifteenth entry: from red to light yellow (warm colors) */
+.abdeck_100 { background-color:			#FFFFB2; }
+.abdeck_95 { background-color:			#FED976; }
+.abdeck_85 { background-color:			#FEB24C; }
+.abdeck_75 { background-color:			#FD8D3C; }
+.abdeck_50 { background-color:			#FC4E2A; }
+.abdeck_25 { background-color:			#E31A1C; }
+.abdeck_0 { background-color:			#B10026; }
+.abdeck_invalid { background-color:		#444444; }
+

@@ -1,0 +1,16 @@
+
+.abdeck_100 { background-color:			#418200; }
+.abdeck_95 { background-color:			#00FF00; }
+.abdeck_85 { background-color:			#FFFF00; }
+.abdeck_75 { background-color:			#FFAAFF; }
+.abdeck_50 { background-color:			#FF0000; }
+.abdeck_25 { background-color:			#FF00FF; }
+.abdeck_0 { background-color:			#54007F; }
+.abdeck_invalid { background-color:			#BBBBBB; }
+
+.ignorierhausnummer {color:red;text-decoration:line-through;}
+
+.jobqueue_open { background-color:			#BBBBBB; }
+.jobqueue_started { background-color:			#FFFF00; }
+.jobqueue_uploaded { background-color:			#00FF00; }
+.jobqueue_finished { background-color:			#418200; }

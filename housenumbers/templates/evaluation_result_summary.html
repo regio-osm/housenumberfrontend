@@ -1,0 +1,118 @@
+{% extends 'pagelayout.html' %}
+
+<!-- popup dialog concept see http://www.javascripttoolbox.com/lib/popup/example.php -->
+
+{% block headerscripts %}
+	<link rel="stylesheet" type="text/css" href="/housenumbers/css/tablesorter.css">
+	<script type="text/javascript" src="/housenumbers/js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript">
+	function getTextExtractor() {
+		return (function() {
+			var patternLetters = /[öäüÖÄÜáàâéèêúùûóòôÁÀÂÉÈÊÚÙÛÓÒÔßÐðÍíÝýÞþÆæ]/g;
+			var patternDateDmy = /^(?:\D+)?(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/;
+			var lookupLetters = {
+				"ä": "a", "ö": "o", "ü": "u",
+				"Ä": "A", "Ö": "O", "Ü": "U",
+				"á": "a", "à": "a", "â": "a",
+				"é": "e", "è": "e", "ê": "e",
+				"ú": "u", "ù": "u", "û": "u",
+				"ó": "o", "ò": "o", "ô": "o",
+				"Á": "A", "À": "A", "Â": "A",
+				"É": "E", "È": "E", "Ê": "E",
+				"Ú": "U", "Ù": "U", "Û": "U",
+				"Ó": "O", "Ò": "O", "Ô": "O",
+				"ß": "s",
+				"Ð": "DZZ", "ð": "dzz", 			// iceland chars
+				"Í": "IZZ", "í": "izz", 			// iceland chars
+				"Ý": "YZZ", "ý": "yzz", 			// iceland chars
+				"Þ": "ZZZ1", "þ": "zzz1",			// iceland chars
+				"Æ": "ZZZ2", "æ": "zzz2"			// iceland chars
+			};
+			var letterTranslator = function(match) { 
+				return lookupLetters[match] || match;
+			}
+	
+		    return function(node) {
+		      var text = $.trim($(node).text());
+		      var date = text.match(patternDateDmy);
+		      if (date)
+		        return [date[3], date[2], date[1]].join("-");
+		      else
+		        return text.replace(patternLetters, letterTranslator);
+		    }
+		  })();
+		}
+	</script>
+{% endblock %}
+
+{% block title %}{{titel}}{% endblock %}
+
+{% block content %}
+
+<table id="nursummentabelle" class="tablesorter" border="all">
+<thead>
+<tr>
+<th>Stadtteil/-bezirk</th>
+<th>% voll- ständig</th>
+<th>Anz. Ident+Stadt</th>
+<th>Anz ident</th>
+<th>Anz. Nur Stadt</th>
+<th>Anz nur OSM</th>
+</tr>
+</thead>
+<tbody>
+{% for job in auswertungsdaten.jobs %}
+<tr>
+<td>
+<form action="" method="get">
+	<a href='/housenumbers/showevaluation?country={{ job.countrycode }}&municipality={{ job.stadt }}&job_ids={{ job.job_id }}''>{{ job.jobname }}</a>
+	{% if job.gebiet_osm_id %}
+		<a target='osmwindows' href='http://www.openstreetmap.org/?relation={{ job.gebiet_osm_id }}'><img height=20 width=20 src='img/osm_logo.png'></a>
+	{% endif %}
+	<a target='osmwindows' href='/housenumbers/anzeige_dynamisch.html?land={{ job.land }}&amp;stadt={{ job.stadt }}&amp;lon={{ job.lon }}&amp;lat={{ job.lat }}&amp;zoom=15'><img height=20 width=20 src='img/osm_logo.png'></a>
+	<a target='osmwindows' href='/housenumbers/historischeentwicklung/grafik?job_id={{ job.job_id }}'><img height=20 width=20 src='img/chart.png'></a>
+
+
+</td>
+{% if params.farbig %}
+<td class="{{ job.abdeckung_class }}">{{ job.abdeckung }}</td>
+{% else %}
+<td>{{ job.abdeckung }}</td>
+{% endif %}
+<td>{{ job.summe_soll }}</td>
+<td>{{ job.summe_identisch }}</td>
+<td>{{ job.summe_nurstadt }}</td>
+<td>{{ job.summe_nurosm }}</td>
+</tr>
+{% endfor %}
+</tbody>
+<tfoot>
+<tr>
+<td><b>Summe für alle Gruppen</b></td>
+{% if params.farbig %}
+<td class="{{ auswertungsdaten.abdeckung_class }}">{{ auswertungsdaten.abdeckung }}</td>
+{% else %}
+<td>{{ auswertungsdaten.abdeckung }}</td>
+{% endif %}
+<td>{{ auswertungsdaten.summe_soll }}</td>
+<td>{{ auswertungsdaten.summe_identisch }}</td>
+<td>{{ auswertungsdaten.summe_nurstadt }}</td>
+<td>{{ auswertungsdaten.summe_nurosm }}</td>
+</tr>
+</tfoot>
+</table>
+<script type="text/javascript">
+var myTextExtraction = function(node)
+{
+								// extract data from markup and return it"; 
+var inhalt = node.childNodes[0].childNodes[0].innerHTML;
+return inhalt;
+}
+$(document).ready(function()
+   {
+       $("#nursummentabelle").tablesorter(  {textExtraction: getTextExtractor()}); 
+   });
+</script>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<link rel="stylesheet" href="/housenumbers/css/normalize.css" />
+		<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" href="/housenumbers/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="/housenumbers/css/hausnummern.css" />
+		<script type="text/javascript">
+		<!--
+		function setcookie() {
+			var lang = document.getElementById('language').value;
+			//TODO
+			document.cookie = 'language='+lang+'; expires=Fri, 3 Aug 2019 20:47:11 UTC; path=/housenumbers';
+			window.location.reload();
+		}
+		function readCookie(name) {
+		    var nameEQ = name + "=";
+		    var ca = document.cookie.split(';');
+		    for(var i=0;i < ca.length;i++) {
+		        var c = ca[i];
+		        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+		    }
+		    return null;
+		}
+		function showactivelanguage() {
+			var lang = readCookie('language');
+			var languageobject = document.getElementById('language');
+			languageobject.value = lang;
+		}
+		//-->
+		</script>
+		{% block headerscripts %}{% endblock %}
+	</head>
+	<body onload="showactivelanguage();{% block bodyonloadscriptcall %}{% endblock %}">
+		<div id="headerLogo" class="clearfix">
+			<div class="logo" ><img src="/housenumbers/img/logo-small.png" /></div>
+			<table width="100%">
+				<tr>
+		         <td><h1><a href="/housenumbers">OpenStreetMap {{ __("housenumber evaluation") }} {{ __("on") }} regio-osm.de</a></h1><td>
+					<td>
+						<select id="language" onchange="setcookie();">
+					    <option value="de">{{ __("german") }}</option>
+					    <option value="en">{{ __("english") }}</option>
+					    <option value="pt-br">{{ __("brazillan portugese") }}</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+			<table width="100%"><tr><td><h2>{{ __("Statistical evaluations for") }} OpenStreetMap</h2></td>
+			<td><span id="loadstatus"></span></td></tr></table>
+		</div>
+		<h3>{% block title %}{{ __("housenumber evaluation") }}{% endblock %}</h3>
+		{% block content %}{% endblock %}
+		<hr>
+		<p><a href="/housenumbers/kontakt.html">Kontakt</a>&nbsp;
+			|&nbsp;<a href="/housenumbers/quellenangaben.html">Quellenangaben</a>
+			|&nbsp;<a href="/housenumbers/mitwirkende.html">Mitwirkende</a>
+			|&nbsp;<a href="/housenumbers/impressum.html">Impressum</a>
+		</p>
+</body>
+</html> 

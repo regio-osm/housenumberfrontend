@@ -1,0 +1,14 @@
+{
+	"name": "hausnummern",
+	"description": "Frontend für Hausnummernauswertung",
+	"version": "0.0.1",
+	"private": true,
+	"dependencies": {
+		"array.prototype.find": "*",
+		"async": "0.x",
+		"dateformat": "1.x",
+		"express": "3.x",
+		"pg": "2.x",
+		"swig": "1.x"
+	}
+} 
