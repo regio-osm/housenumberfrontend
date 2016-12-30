@@ -6,9 +6,7 @@ var swig = require("swig");
 var async = require("async");
 var querystring = require("querystring");
 var Housenumberobject = require("./Housenumberobject");
-//var projecturls = require("../projecturls");
 var math = require("mathjs");
-//require("array.prototype.find");
 
 /*
  *  V1.2, 17.05.2014, Dietmar Seifert
@@ -53,7 +51,6 @@ function selectmunicipality(request, response) {
 		for(var rowi = 0; rowi < result.rows.length; rowi++) {
 			result.rows[rowi].namenormalized = result.rows[rowi].name.replace(/[ \-]/gi,"");
 			var row_hierarchy = result.rows[rowi].osm_hierarchy;
-			//console.log("row["+rowi+"] ===" + result.rows[rowi].name + "===    " + result.rows[rowi].osm_hierarchy + "===");
 			if(row_hierarchy != undefined) {
 				var row_hierarchy_elements = row_hierarchy.split(",");
 				var level1 = "";
@@ -64,7 +61,6 @@ function selectmunicipality(request, response) {
 				if(row_hierarchy_elements.length >= 1) {
 					level1 = row_hierarchy_elements[0];
 				}
-				//console.log("  akt level1 ===" + level1 + "===  level2 ====" + level2 + "===");
 
 				var gefundenl1 = false;
 				var gefundenl2 = false;
@@ -994,7 +990,7 @@ function gpx_ausgeben(request, response) {
 	//                                show
 	// ---------------------------------------------------------------------------------------------
 function show(request, response) {
-	console.time("auswertung_show");
+	console.time("showevaluation");
 	
 	var auswertungsdaten = {
 		jobs: [],
@@ -1025,7 +1021,7 @@ function show(request, response) {
 	if(!params.municipality) {
 		var fehlertitel = "Auswertung einer Gemeinde: Stadt nicht ausgewählt";
 		var meldetext = "Es wurde keine Stadt ausgewählt, die ausgewertet werden soll. bitte die Auswahl neu treffen.";
-		var fortsetzurl = "/housenumbers/auswertung_auswahlort"; 
+		var fortsetzurl = "/housenumbers/selectmunicipality"; 
 		response.render("evaluation_missingparameters.html", {title: fehlertitel, fehlermeldung: meldetext, fortsetzurl: fortsetzurl});
 		return;
 	}
@@ -1318,7 +1314,7 @@ function show(request, response) {
 			response.render(params.nursummen ? "evaluation_result_summary.html" : "evaluation_result.html", 
 				{params: params, auswertungsdaten: auswertungsdaten});
 
-			console.timeEnd("auswertung_show");
+			console.timeEnd("showevaluation");
 		});
 	});
 }

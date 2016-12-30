@@ -35,10 +35,10 @@ handle["/en/selectevaluation"] = evaluation.selectevaluation;
 handle["/en/showevaluation"] = evaluation.show;
 
 /*
-					handle["/theoretische_auswertung_anzeigen"] = theo_auswertung.show;
 					handle["/gpx_ausgeben"] = evaluation.gpx_ausgeben;
 					handle["/offizielle_koordinaten_ausgeben"] = evaluation.offizielle_koordinaten_ausgeben;
 					handle["/offizielle_koordinaten_abgleichen"] = evaluation.offizielle_koordinaten_abgleichen;
+
 					handle["/karte_auswahlort"] = grafikanforderung.ort_dialog;
 					handle["/theoreticalevaluation"] = grafikanforderung.theoevaluation;
 					handle["/historischeentwicklung/grafik"] = historischeentwicklung.show;
@@ -58,6 +58,7 @@ handle["/en/showevaluation"] = evaluation.show;
 					handle["/nextopenjobs"] = jobqueue.nextOpenJobs;
 					handle["/nextopenjobshierarchy"] = jobqueue.nextOpenJobsHierarchy;
 					handle["/evaluationinstantrequest"] = jobqueue.requestInstantJob;
+					handle["/theoretische_auswertung_anzeigen"] = theo_auswertung.show;
 					handle["/state"] = state.show;
 
 					handle["/api/getmissingstreetnumbers"] = api_getmissingstreetnumbers.request;
