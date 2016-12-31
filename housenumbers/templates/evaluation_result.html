@@ -4,7 +4,7 @@
 
 {% block headerscripts %}
 	<link rel="stylesheet" type="text/css" href="/housenumbers/css/tablesorter.css">
-	<script type="text/javascript" src="/housenumbers/js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="/housenumbers/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="/housenumbers/js/popup.js"></script>
 	<script type="text/javascript">
@@ -131,12 +131,12 @@
 		{% endif %}
 		{% if job.paralistcoordosmuploadable == 'yes' %}
 			<p>{{ __("in OSM still missing housenumbers") }}: 
-			&nbsp;&nbsp;<a target='josmiframe' href='/housenumbers/offizielle_koordinaten_ausgeben?job_id={{ job.job_id }}'>{{ __("with official geocoordindates as OSM file") }}</a>
+			&nbsp;&nbsp;<a target='josmiframe' href='/housenumbers/exportofficialgeocoordinates?job_id={{ job.job_id }}'>{{ __("with official geocoordindates as OSM file") }}</a>
 			</p>
 		{% endif %}
 		<p>{{ __("in OSM still missing housenumbers als GPX file") }}: 
-		&nbsp;&nbsp;<a target='gpxwindow' href='/housenumbers/gpx_ausgeben?job_id={{ job.job_id }}'>{{ __("all") }}</a><br />
-		&nbsp;&nbsp;<a target='gpxwindow' href='/housenumbers/gpx_ausgeben?job_id={{ job.job_id }}&nichtexistierendehausnummernfiltern=ja'>{{ __("missing, which are not marked as obsolete") }}</a>
+		&nbsp;&nbsp;<a target='gpxwindow' href='/housenumbers/exportgpx?job_id={{ job.job_id }}'>{{ __("all") }}</a><br />
+		&nbsp;&nbsp;<a target='gpxwindow' href='/housenumbers/exportgpx?job_id={{ job.job_id }}&filterignoredhousenumbers=yes'>{{ __("missing, which are not marked as obsolete") }}</a>
 		</p>
 		<p>
 		{% if params.editieren %}

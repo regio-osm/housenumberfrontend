@@ -1,0 +1,52 @@
+{% extends 'pagelayout.html' %}
+
+<!-- popup dialog concept see http://www.javascripttoolbox.com/lib/popup/example.php -->
+
+{% block headerscripts %}
+	<link rel="stylesheet" type="text/css" href="/housenumbers/css/tablesorter.css">
+	<script type="text/javascript" src="/housenumbers/js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/popup.js"></script>
+	<script type="text/javascript">
+
+
+		// REMOTECONTROL BINDINGS
+		// source: http://crab-import.osm.be/loadStreets.js
+		// unknown copyright
+		function openInJosm(layerName)
+		{
+			if((layerName == undefined) || (layerName == ""))
+				layerName = "importaddresses";
+
+			var osmfilecontent = "{% autoescape false %}{{ osmfilecontent }}{% endautoescape %}";
+			var url =  "http://localhost:8111/load_data?new_layer=true&layer_name="+layerName+"&data=";
+
+
+				$.ajax({
+					  method: "GET",
+					  url: url + encodeURIComponent(osmfilecontent)
+					})
+					  .done(function( msg ) {
+					    //alert( "Data Saved: " + msg );
+					  })
+					  .fail(function() {
+					    alert( "error" );
+					  })
+					  .always(function() {
+					    //alert( "complete" );
+					  });
+			}
+	</script>
+{% endblock %}
+
+{% block title %}{{titel}}{% endblock %}
+
+{% block content %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			openInJosm("importaddresses");
+		});
+	</script>
+	<p>upload osm file to josm, josm must already be running and accept remote control communication</p>
+	<iframe id="josmiframe" name="josmiframe" style="display:none;"></iframe>
+{% endblock %}
