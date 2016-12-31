@@ -13,7 +13,7 @@ var math = require("mathjs");
  *  	manuelle komplette Übernahme der Änderungen von user ewoerner aus Github-Projekt
  *  
 	V1.1, 20.11.2013, Dietmar Seifert
-		*	Ergänung Fkt. gpx_ausgeben, um die Positionen der fehlenden Hausnummern per GPX auszugeben
+		*	Ergänung Fkt. exportgpx, um die Positionen der fehlenden Hausnummern per GPX auszugeben
 */
 //TODO bei GPX-Ausgabe die Adressen in Tabelle notexisting_housenumbers herausfiltern
 
@@ -170,14 +170,14 @@ function selectevaluation(request, response) {
 //=============================================================================================
 //			exportieren der offiziellen Adressen mit offiziellen Geokoordinaten, wenn verfügbar
 //---------------------------------------------------------------------------------------------
-function offizielle_koordinaten_ausgeben(request, response) {
-	console.time("offizielle_koordinaten_ausgeben");
+function exportofficialgeocoordinates(request, response) {
+	console.time("exportofficialgeocoordinates");
 
 	var params = {
 		job_id: request.query["job_id"] || ""
 	};
 	for(var parami in params) {
-		console.log("in auswertung.js/offizielle_koordinaten_ausgeben: params["+parami+"]===" + params[parami] + "===");
+		console.log("in auswertung.js/exportofficialgeocoordinates: params["+parami+"]===" + params[parami] + "===");
 	}
 
 	return response.getClient(function(err, client, done) {
@@ -187,28 +187,32 @@ function offizielle_koordinaten_ausgeben(request, response) {
 		}
 
 		var query_string = "SELECT sh.id AS sh_id, ST_X(sh.point) AS lon, ST_Y(sh.point) AS lat,"
-			+ " strasse, sh.hausnummer AS hausnummer, officialgeocoordinates,"
+			+ " stadt, sh.postcode, strasse, sh.hausnummer AS hausnummer, officialgeocoordinates,"
 			+ " parameters->'listcoordosmuploadable' AS paralistcoordosmuploadable,"
 			+ " parameters->'listcoordosmuploadlimitcount' AS paralistcoordosmuploadlimitcount"
-			+ " FROM auswertung_hausnummern AS ah, stadt_hausnummern AS sh, strasse AS str, stadt AS s"
-			+ " WHERE ah.stadt_id = sh.stadt_id AND ah.strasse_id = sh.strasse_id"
-			+ " AND ah.hausnummer = sh.hausnummer"
-			+ " AND ah.job_id = $1"
-			+ " AND (treffertyp = 's' OR treffertyp = 'l')"
-			+ " AND sh.strasse_id = str.id"
-			+ " AND sh.stadt_id = s.id"
+			+ " FROM stadt_hausnummern AS sh"
+			+ " JOIN stadt as s ON sh.stadt_id = s.id"
+			+ " JOIN strasse as str ON sh.strasse_id = str.id"
+			+ " JOIN auswertung_hausnummern AS ah"
+			+ " ON ah.stadt_id = sh.stadt_id AND ah.strasse_id = sh.strasse_id AND"
+			+ " ah.hausnummer = sh.hausnummer"
+			+ " WHERE ah.job_id = $1"
+			+ " AND treffertyp = 'l'"
 			+ " ORDER BY strasse, sh.hausnummer_sortierbar;";
-console.log("query_string ==="+query_string+"===");
-console.log("params.job_id ==="+params.job_id+"===");
+		console.log("query_string ==="+query_string+"===");
+		console.log("params.job_id ==="+params.job_id+"===");
 		var hausnummern = [];
 
 		var query_hnr = client.query({name: "hnr_koordinaten", text: query_string, values: [params.job_id]});
 		var osmnodeid = -1;
 		var paralistcoordosmuploadable;
-		var paralistcoordosmuploadlimitcount = 999999;
+		var paralistcoordosmuploadlimitcount = 2000;
 		var counthousenumbers= 0;
 
 		query_hnr.on("row",function(row) {
+			if(counthousenumbers > paralistcoordosmuploadlimitcount)
+				return;
+			
 			if(row.paralistcoordosmuploadable)
 				paralistcoordosmuploadable = row.paralistcoordosmuploadable;
 			if(row.paralistcoordosmuploadlimitcount)
@@ -220,21 +224,15 @@ console.log("params.job_id ==="+params.job_id+"===");
 					counthousenumbers++;
 					row['id'] = osmnodeid--;
 					hausnummern.push(row);
-					console.log("add official housenumber: " + row.strasse + " " + row.hausnummer
-						+ "   Geokoord. lon/lat: " + row.lon + "   " + row.lat);
 				}
-			} else {
-				console.log("ignore record in auswertung_hausnummern with id: " + row.sh_id);
 			}
-		});		// end of query_hnr.on("row")
-		console.log("Anzahl vergebene osmids: "+osmnodeid);
+		});
 
 		query_hnr.on("end",function(result) {
 			console.log("Count official housenumbers still missing: " + hausnummern.length);
-			done();
 
 			var osmfilecontent = "";
-			osmfilecontent += "<osm version='0.6' upload='false' generator='regio-osm.de:hausnummerauswertung'>";
+			osmfilecontent += "<osm version='0.6' upload='false' generator='regio-osm.de:housenumbers'>";
 			var counthousenumbers= 0;
 			for(var hnrindex in hausnummern) {
 				var hnr = hausnummern[hnrindex];
@@ -243,26 +241,30 @@ console.log("params.job_id ==="+params.job_id+"===");
 					&&	(paralistcoordosmuploadlimitcount < counthousenumbers))
 					break;
 				osmfilecontent += "<node id='" + hnr.id + "' action='modify' visible='true' lat='" + hnr.lat + "' lon='" + hnr.lon + "'>";
+				osmfilecontent += "<tag k='addr:city' v='" + hnr.stadt + "' />";
+				if(hnr.postcode)
+					osmfilecontent += "<tag k='addr:postcode' v='" + hnr.postcode + "' />";
 				osmfilecontent += "<tag k='addr:street' v='" + hnr.strasse + "' />";
 				osmfilecontent += "<tag k='addr:housenumber' v='" + hnr.hausnummer + "' />";
 				osmfilecontent += "</node>";
 			}
 			osmfilecontent += "</osm>";
-			
 			if(hausnummern.length > 0) {
-				response.render("osmuploadtojosm.html", {osmfilecontent: osmfilecontent});
+				response.render("exportosmcontenttojosm.html", {
+					titel:			"Official geocoordinates for josm import", 
+					osmfilecontent:	osmfilecontent});
 			} else {
-				response.writeHead(200, {"Content-Type": "text/plain; charset=utf-8"});
-				response.write("Es gibt keine offiziellen Geokoordinaten in dieser Umgebung.\n");
-				response.end();
+				response.render("evaluation_missingparameters.html", 
+					{	fortsetzurl: "/housenumbers/showevaluation?job_id=" + params.job_id,
+						fehlermeldung: I18n.__("no official geocoordinates available")});
 			}
 
-			console.timeEnd("offizielle_koordinaten_ausgeben");
-		});		// end of query_hnr.on("end")
+			console.timeEnd("exportofficialgeocoordinates");
+		});
 	});
 }
 //---------------------------------------------------------------------------------------------
-//offizielle_koordinaten_ausgeben
+//exportofficialgeocoordinates
 //=============================================================================================
 
 
@@ -304,7 +306,6 @@ function offizielle_koordinaten_abgleichen(request, response) {
 		var query_string = "SELECT strasse, sh.hausnummer AS hausnummer, osm_id, osm_objektart,"
 			+ " ST_X(ST_AsText(sh.point)) AS liste_koordinate_lon, ST_Y(ST_AsText(sh.point)) AS liste_koordinate_lat,"
 			+ " ST_X(ST_AsText(ah.point)) AS osm_koordinate_lon, ST_Y(ST_AsText(ah.point)) AS osm_koordinate_lat"
-//			+ ", round(ST_Distance(ST_Transform(sh.point,31468), ST_Transform(ah.point,31468))::numeric, 3) AS diff"
 			+ ", round(lonlatdistance(ST_X(ah.point), ST_Y(ah.point), ST_X(sh.point), ST_Y(sh.point))::numeric, 1) AS diff"
 			+ " FROM stadt_hausnummern AS sh"
 			+ " JOIN stadt AS s ON sh.stadt_id = s.id"
@@ -840,18 +841,18 @@ if ((neuLon == LONGUNSET) || (neuLat == LONGUNSET)) {
 
 
 //=============================================================================================
-//                                gpx_ausgeben
+//                                exportgpx
 // ---------------------------------------------------------------------------------------------
-function gpx_ausgeben(request, response) {
-	console.time("gpx_ausgeben");
+function exportgpx(request, response) {
+	console.time("exportgpx");
 	
 	var params = {
 		jobid: request.query["job_id"] || "",
-		nichtexistierendehausnummernfiltern: request.query["nichtexistierendehausnummernfiltern"] || "nein"
+		nichtexistierendehausnummernfiltern: request.query["filterignoredhousenumbers"] || "no"
 	};
 
 	for(var parami in params) {
-		console.log("in auswertung.js/gpx_ausgeben: params["+parami+"]===" + params[parami] + "===");
+		console.log("in housenumbers/exportgpx: params["+parami+"]===" + params[parami] + "===");
 	}
 	
 	return response.getClient(function(err, client, done) {
@@ -859,129 +860,124 @@ function gpx_ausgeben(request, response) {
 			console.log("FEHLER bei pg.connect ...");
 			console.log("Forts. "+err.toString());
 		}
-		
-		
-		// hol die nicht-existierenden Hausnummern, damit diese bei der GPX-Ausgabe unterdrückt oder gekennzeichnet werden
-		var query_notexistinghousenumbers_string = "SELECT street, housenumber"
-			+ " FROM notexisting_housenumbers, jobs, stadt, land WHERE"
-			+ " jobs.id = $1 AND"
-			+ " jobs.stadt_id = stadt.id AND"
-			+ " jobs.land_id = land.id AND"
-			+ " city like stadt.stadt AND"
-			+ " country = land.land;";
-		// TODO nextcheckdate aktiv berücksichtigen, ob evtl. zeitlich verfallen
 
-		client.query({name: "gpx_ausgeben_1", text: query_notexistinghousenumbers_string, values: [params.jobid, params.landcode]}, function(error, notexistinghousenumbers_result) {
+		var query_string = "SELECT osm_id, strasse.strasse AS strasse, auswertung_hausnummern.hausnummer AS hausnummer,"
+			+ " osm_objektart, ST_X(point) AS lon, ST_Y(point) AS lat,"
+			+ " ignore.housenumber IS NOT NULL AS ignoriert, ignore.reason AS ignoriert_begruendung,"
+			+ " to_char(ignore.nextcheckdate, 'DD.MM.YYYY') AS ignoriert_nextcheckdate"
+			+ " FROM auswertung_hausnummern JOIN strasse ON"
+			+ " auswertung_hausnummern.strasse_id = strasse.id"
+			+ " JOIN stadt ON auswertung_hausnummern.stadt_id = stadt.id"
+			+ " JOIN land ON auswertung_hausnummern.land_id = land.id"
+			+ " LEFT JOIN"
+			+ " (SELECT DISTINCT ON (street, housenumber) * FROM"
+			+ " notexisting_housenumbers WHERE current_date < nextcheckdate) ignore ON"
+			+ " strasse.strasse = ignore.street AND stadt.stadt = ignore.city AND"
+			+ " land.land = ignore.country AND"
+			+ " auswertung_hausnummern.hausnummer = ignore.housenumber"
+			+ " WHERE auswertung_hausnummern.job_id = $1"
+			+ " ORDER BY correctorder(strasse.strasse), auswertung_hausnummern.hausnummer_sortierbar,"
+			+ " auswertung_hausnummern.hausnummer;";
+//TODO take care of notexisting housenumbers in query
+		var waypoints = [];
+		var maxwaypoints = 2000;	// limit load on calculation and output
 
-			var query_string = "select osm_id, strasse, hausnummer, osm_objektart, ST_X(point) as lon, ST_Y(point) as lat"
-				+ " FROM auswertung_hausnummern AS ah, strasse AS s"
-				+ " WHERE ah.job_id = $1"
-				+ " AND ah.strasse_id = s.id"
-//				+ " AND (ah.treffertyp = 's' OR ah.treffertyp = 'l')"
-				+ " ORDER BY correctorder(strasse),hausnummer_sortierbar, hausnummer;";
-	
-			var waypoints = [];
-			var maxwaypoints = 2000;	// limit load on calculation and output
-	
-			var query_hnr = client.query({name: "gpx_ausgeben_2", text: query_string, values: [params.jobid]});
-			var gpxpuffer;
+		var query_hnr = client.query({name: "exportgpx", text: query_string, values: [params.jobid]});
+		var gpxpuffer;
 
-			var osmHnrobjekte = [];
+		var osmHnrobjekte = [];
 
-			query_hnr.on("row",function(row) {
-				var akt_osmobjektart = row.osm_objektart != null ? row.osm_objektart : "";
-				var akt_lon = row.lon != null ? row.lon : "";
-				var akt_lat = row.lat != null ? row.lat : "";
-				//console.log("==> " + row.strasse + " " + row.hausnummer + " (" + row.lon + "/" + row.lat);
-				osmHnrobjekte.push(new Housenumberobject(row.osm_id, row.strasse, row.hausnummer, "dummy", akt_osmobjektart, akt_lon, akt_lat));
-			});
+		query_hnr.on("row",function(row) {
+			var akt_osmobjektart = row.osm_objektart != null ? row.osm_objektart : "";
+			var akt_lon = row.lon != null ? row.lon : "";
+			var akt_lat = row.lat != null ? row.lat : "";
+			osmHnrobjekte.push(new Housenumberobject(row.osm_id, row.strasse, row.hausnummer, "dummy", akt_osmobjektart, akt_lon, akt_lat));
+		});
 
-			query_hnr.on("end",function(result) {
-				console.log("at query-end");
-				console.log("at query-end after done, Count osmHnrobjekte: " + osmHnrobjekte.length);
-				var hnrobjekteAktStrasse = [];
-				var vorherigeStrasse = "";
-				var aktStrasseAnzahlOffeneHnr = 0;
-				var aktStrasseAnzahlVorhandeneHnr = 0;
+		query_hnr.on("end",function(result) {
+			console.log("at query-end Count osmHnrobjekte: " + osmHnrobjekte.length);
+			var hnrobjekteAktStrasse = [];
+			var vorherigeStrasse = "";
+			var aktStrasseAnzahlOffeneHnr = 0;
+			var aktStrasseAnzahlVorhandeneHnr = 0;
 
-					// dirty: pseudo Hnr-Objekt ans Ende setzen, damit alle Strassen abgearbeitet werden
-				osmHnrobjekte.push(new Housenumberobject("-4711", "xyzblubblu", "9876", "dummy", "", "", ""));
+				// dirty: pseudo Hnr-Objekt ans Ende setzen, damit alle Strassen abgearbeitet werden
+			osmHnrobjekte.push(new Housenumberobject("-4711", "xyzblubblu", "9876", "dummy", "", "", ""));
 
-				var countwaypoints = 0;
-				
-				for(var osmHnrobjekteIndex = 0; osmHnrobjekteIndex < osmHnrobjekte.length; osmHnrobjekteIndex++) {
-					var aktHnrobjekt = osmHnrobjekte[osmHnrobjekteIndex];
-						// if act housenumber is in another street than last ones, work on previous street housenumbers in array hnrobjekteAktStrasse
-					//console.log("Staßenwechseltest: aktHnrobjekt.strasse ===" + aktHnrobjekt.strasse + "===, vorherigeStrasse ===" + vorherigeStrasse + "=== ...");
+			var countwaypoints = 0;
+			
+			for(var osmHnrobjekteIndex = 0; osmHnrobjekteIndex < osmHnrobjekte.length; osmHnrobjekteIndex++) {
+				var aktHnrobjekt = osmHnrobjekte[osmHnrobjekteIndex];
+					// if act housenumber is in another street than last ones, work on previous street housenumbers in array hnrobjekteAktStrasse
+				//console.log("Staßenwechseltest: aktHnrobjekt.strasse ===" + aktHnrobjekt.strasse + "===, vorherigeStrasse ===" + vorherigeStrasse + "=== ...");
 
-					if((aktHnrobjekt.strasse != vorherigeStrasse)) {
-						//console.log(" ok, Straßenwechsel  von ===" + vorherigeStrasse + "=== nach ===" +  aktHnrobjekt.strasse
-						//	+ "  Zahlen: offene: " + aktStrasseAnzahlOffeneHnr  + "   mit lat-lon: " + aktStrasseAnzahlVorhandeneHnr);
-						if((aktStrasseAnzahlOffeneHnr > 0) && (aktStrasseAnzahlVorhandeneHnr > 0)) {
-							//console.log(" ok, Straße hat offene Hausnummern !!!");
-							for(var hnrobjekteAktStrasseIndex = 0; hnrobjekteAktStrasseIndex < hnrobjekteAktStrasse.length; hnrobjekteAktStrasseIndex++) {
-								var aktHnrobjektAktStrasse = hnrobjekteAktStrasse[hnrobjekteAktStrasseIndex];
-								//console.log("Street ===" + aktHnrobjektAktStrasse.strasse + "===, Hnr. ===" + aktHnrobjektAktStrasse.hausnummer 
-								//	+ "===, lon ===" + aktHnrobjektAktStrasse.lon + ", " + aktHnrobjektAktStrasse.lat + "=== ...");
-								if((aktHnrobjektAktStrasse.lon != undefined) && (aktHnrobjektAktStrasse.lon != "") 
-										&& (aktHnrobjektAktStrasse.osm_objektart != undefined) && (aktHnrobjektAktStrasse.osm_objektart != "")) {
-									continue;
-								}
-								var strasseLonlat = "";
-								var ermittelteAdresspositionstring = calculateCoordinateForAMissingHousenumber(vorherigeStrasse, 
-									strasseLonlat, aktHnrobjektAktStrasse.hausnummer, hnrobjekteAktStrasse, hnrobjekteAktStrasse.length);
-								if (ermittelteAdresspositionstring != "") {
-									var tempstring = 
-										ermittelteAdresspositionstring.substring(0, ermittelteAdresspositionstring.indexOf(" "));
-									//console.log("auf-strasse lon (string) ===" + tempstring + "===");
-									var ermittelteLon = tempstring;
-		
-									tempstring = ermittelteAdresspositionstring.substring(ermittelteAdresspositionstring.indexOf(" ") + 1);
-									//console.log("auf-strasse lat (string) ===" + tempstring + "===");
-									var ermittelteLat = tempstring;
-		
-									if (ermittelteLon != "4711.0") {
-										var waypoint = {};
-										waypoint.lon = ermittelteLon;
-										waypoint.lat = ermittelteLat;
-										waypoint.strasse = vorherigeStrasse;
-										waypoint.hausnummer = aktHnrobjektAktStrasse.hausnummer;
-										//waypoint.source = "OSMapprox";
-										if(countwaypoints < maxwaypoints) {
-											waypoints.push(waypoint);
-											countwaypoints++;
-										}
-									}
-								}							
+				if((aktHnrobjekt.strasse != vorherigeStrasse)) {
+					//console.log(" ok, Straßenwechsel  von ===" + vorherigeStrasse + "=== nach ===" +  aktHnrobjekt.strasse
+					//	+ "  Zahlen: offene: " + aktStrasseAnzahlOffeneHnr  + "   mit lat-lon: " + aktStrasseAnzahlVorhandeneHnr);
+					if((aktStrasseAnzahlOffeneHnr > 0) && (aktStrasseAnzahlVorhandeneHnr > 0)) {
+						//console.log(" ok, Straße hat offene Hausnummern !!!");
+						for(var hnrobjekteAktStrasseIndex = 0; hnrobjekteAktStrasseIndex < hnrobjekteAktStrasse.length; hnrobjekteAktStrasseIndex++) {
+							var aktHnrobjektAktStrasse = hnrobjekteAktStrasse[hnrobjekteAktStrasseIndex];
+							//console.log("Street ===" + aktHnrobjektAktStrasse.strasse + "===, Hnr. ===" + aktHnrobjektAktStrasse.hausnummer 
+							//	+ "===, lon ===" + aktHnrobjektAktStrasse.lon + ", " + aktHnrobjektAktStrasse.lat + "=== ...");
+							if((aktHnrobjektAktStrasse.lon != undefined) && (aktHnrobjektAktStrasse.lon != "") 
+									&& (aktHnrobjektAktStrasse.osm_objektart != undefined) && (aktHnrobjektAktStrasse.osm_objektart != "")) {
+								continue;
 							}
+							var strasseLonlat = "";
+							var ermittelteAdresspositionstring = calculateCoordinateForAMissingHousenumber(vorherigeStrasse, 
+								strasseLonlat, aktHnrobjektAktStrasse.hausnummer, hnrobjekteAktStrasse, hnrobjekteAktStrasse.length);
+							if (ermittelteAdresspositionstring != "") {
+								var tempstring = 
+									ermittelteAdresspositionstring.substring(0, ermittelteAdresspositionstring.indexOf(" "));
+								//console.log("auf-strasse lon (string) ===" + tempstring + "===");
+								var ermittelteLon = tempstring;
+	
+								tempstring = ermittelteAdresspositionstring.substring(ermittelteAdresspositionstring.indexOf(" ") + 1);
+								//console.log("auf-strasse lat (string) ===" + tempstring + "===");
+								var ermittelteLat = tempstring;
+	
+								if (ermittelteLon != "4711.0") {
+									var waypoint = {};
+									waypoint.lon = ermittelteLon;
+									waypoint.lat = ermittelteLat;
+									waypoint.strasse = vorherigeStrasse;
+									waypoint.hausnummer = aktHnrobjektAktStrasse.hausnummer;
+									//waypoint.source = "OSMapprox";
+									if(countwaypoints < maxwaypoints) {
+										waypoints.push(waypoint);
+										countwaypoints++;
+									}
+								}
+							}							
 						}
-							// reset all variables for collecting housenumbers for next street
-						hnrobjekteAktStrasse = [];
-						vorherigeStrasse = aktHnrobjekt.strasse;
-						aktStrasseAnzahlOffeneHnr = 0;
-						aktStrasseAnzahlVorhandeneHnr = 0;
 					}
-						// collect all housenumber into array for one street
-					hnrobjekteAktStrasse.push(aktHnrobjekt);
-					if((aktHnrobjekt.lon == undefined) || (aktHnrobjekt.lon == "") || (aktHnrobjekt.osm_objektart == ""))
-						aktStrasseAnzahlOffeneHnr++;
-					else
-						aktStrasseAnzahlVorhandeneHnr++;
-
-					//console.log("  Anzahl im Array: " + hnrobjekteAktStrasse.length + ",   " + aktHnrobjekt.strasse + " " + aktHnrobjekt.hausnummer + "    ("
-					//	+ aktHnrobjekt.lon + "/" + aktHnrobjekt.lat + ")    aktStrasseOffeneHausnummern: " + aktStrasseOffeneHausnummern);
+						// reset all variables for collecting housenumbers for next street
+					hnrobjekteAktStrasse = [];
+					vorherigeStrasse = aktHnrobjekt.strasse;
+					aktStrasseAnzahlOffeneHnr = 0;
+					aktStrasseAnzahlVorhandeneHnr = 0;
 				}
-				response.setHeader("Content-Type", "text/plain; charset=utf-8");
-				response.render("gpx_ausgeben.html", {waypoints: waypoints});
-		
-				console.timeEnd("gpx_ausgeben");
-				done();
-			});
+					// collect all housenumber into array for one street
+				hnrobjekteAktStrasse.push(aktHnrobjekt);
+				if((aktHnrobjekt.lon == undefined) || (aktHnrobjekt.lon == "") || (aktHnrobjekt.osm_objektart == ""))
+					aktStrasseAnzahlOffeneHnr++;
+				else
+					aktStrasseAnzahlVorhandeneHnr++;
+
+				//console.log("  Anzahl im Array: " + hnrobjekteAktStrasse.length + ",   " + aktHnrobjekt.strasse + " " + aktHnrobjekt.hausnummer + "    ("
+				//	+ aktHnrobjekt.lon + "/" + aktHnrobjekt.lat + ")    aktStrasseOffeneHausnummern: " + aktStrasseOffeneHausnummern);
+			}
+			response.setHeader("Content-Type", "text/plain; charset=utf-8");
+			response.render("exportgpx.html", {waypoints: waypoints});
+	
+			console.timeEnd("exportgpx");
+			done();
 		});
 	});
 }
 //---------------------------------------------------------------------------------------------
-//gpx_ausgeben
+//exportgpx
 // =============================================================================================
 
 
@@ -1044,6 +1040,7 @@ function show(request, response) {
 	// TODO weitere Parameter auslesen
 	// TODO aktuellen Stand der DB zeigen durch auslesen state.txt
 
+		// get job details and newest evaluation for the job
 	var query_string = "SELECT osm_id as osm_relation_id,"
 		+ " ST_X(ST_Transform(ST_Centroid(gebiete.polygon),4326)) AS lon,"
 		+ " ST_Y(ST_Transform(ST_Centroid(gebiete.polygon),4326)) AS lat,"
@@ -1130,6 +1127,8 @@ function show(request, response) {
 
 			// TODO heute ende
 			// TODO aktuell - das Array notexistinghousenumbers_result weiter unten bei treffertyp i und s berücksichtigen und einblenden bzw. ausblenden
+
+				// get all housenumbers from newest evaluation, including ignored not-existing housenumbers as ignore.*
 			var query_hnr_string = "SELECT"
 				+ "   auswertung_hausnummern.id AS auswertung_hausnummern_id,"
 				+ "   strasse.strasse,"
@@ -1191,11 +1190,11 @@ function show(request, response) {
 				console.timeEnd("hnr-query");
 				
 				hnr_result.rows.forEach(function(hnr_row) {
+						// if street changes, initialize a street structure for summarized data
 					if (!strasse || strasse.strasse_id != hnr_row.strasse_id) {
 						strasse = {
 							name: hnr_row.strasse,
 							strasse_id: hnr_row.strasse_id,
-							//strassenids: [], // at 2015-01-25 deactivated, because roads missing in osm will not be shown otherwise							
 							strassenids: hnr_row.osm_strassen_ids ? hnr_row.osm_strassen_ids.split(",") : [],
 							lon: hnr_row.lon,
 							lat: hnr_row.lat,
@@ -1232,36 +1231,35 @@ function show(request, response) {
 						ignoriert_begruendung: hnr_row.ignoriert_begruendung == undefined ? undefined : hnr_row.ignoriert_begruendung.replace(/[\r\n\f]/gi,""),
 						ignoriert_nextcheckdate: hnr_row.ignoriert_nextcheckdate
 					};
-					
+
 					var liste;
 					var suffix = parseInt(hnr_row.hausnummer) % 2 == 0 ? "gerade" : "ungerade";
 
-					if(hnr_row.treffertyp == "i") {
+					if(hnr_row.treffertyp == "i") {		// i = identical: housenumber in list and in osm
 						strasse.summe_identisch++;
 						strasse.summe_soll++;
 						liste = "identisch";
-					} else if(	(hnr_row.treffertyp == "l") 
-							|| 	(hnr_row.treffertyp == "s")) {
+					} else if(hnr_row.treffertyp == "l") {		// l = list-only: housenumber only in list
 						if (!hausnummer.ignoriert) {
 							strasse.summe_soll++;
 							strasse.summe_nurstadt++;
 						}
 						liste = "nurstadt";
-					} else if(hnr_row.treffertyp == "o") {
+					} else if(hnr_row.treffertyp == "o") {		// o = osm-only: housenumber only in osm, not in list
 						strasse.summe_nurosm++;
 						liste = "nurosm";
 					} else {
 						console.log("Error, Error: treffertyp with unknown value ===" + hnr_row.treffertyp + "===, auswertung_hausnummern id was " + hnr_row.auswertung_hausnummern_id);
 					}
-					
+
 					strasse["hausnummern_" + liste].push(hausnummer);
 					strasse["hausnummern_" + liste + "_" + suffix].push(hausnummer);
 				});
 				console.timeEnd("hnr-query");
 
 				job.strassen.forEach(function(strasse) {
-					// Straße fertigstellen
-					auswerten(strasse);
+						// finish street
+					classify(strasse);
 					if (params.hnrausgabe_gerade_ungerade) {
 						strasse.hausnummern_nurstadt = strasse.hausnummern_nurstadt_ungerade.concat(strasse.hausnummern_nurstadt_gerade);
 						strasse.hausnummern_nurosm = strasse.hausnummern_nurosm_ungerade.concat(strasse.hausnummern_nurosm_gerade);
@@ -1276,18 +1274,23 @@ function show(request, response) {
 					delete strasse.hausnummern_identisch_ungerade;
 
 					strasse.flag_strassefiltern = false;
+						// if option active "suppress streets with all housenumbers"
 					if(params.unterdrueckfertigestrassen == 'jaallevollstaendig') {
+							// if all housenumbers
 						if(strasse.summe_soll == strasse.summe_identisch) {
+								// set flag to filter
 							strasse.flag_strassefiltern = true;
 						}
 					}
+						// if option active "suppress streets with all housenumbers, if no osm-only housenumbers found
 					if(params.unterdrueckfertigestrassen == 'javollstaendigohnenurosm') {
 						if((strasse.summe_soll == strasse.summe_identisch) && (strasse.summe_nurosm == 0)) {
+								// set flag to filter
 							strasse.flag_strassefiltern = true;
 						}
 					}
 
-					// Auf Job addieren
+						// add sums for complete job
 					job.summe_nurstadt += strasse.summe_nurstadt;
 					job.summe_identisch += strasse.summe_identisch;
 					job.summe_nurosm += strasse.summe_nurosm;
@@ -1295,10 +1298,10 @@ function show(request, response) {
 					job.summe_soll += strasse.summe_soll;
 				});
 				
-				// Job fertigstellen
-				auswerten(job);
+					// finish job
+				classify(job);
 				
-				// Auf Auswertung addieren
+					// add sums for complete evaluation (all jobs)
 				auswertungsdaten.summe_nurstadt += job.summe_nurstadt;
 				auswertungsdaten.summe_nurosm += job.summe_nurosm;
 				auswertungsdaten.summe_identisch += job.summe_identisch;
@@ -1308,8 +1311,8 @@ function show(request, response) {
 				callback();
 			});
 		}, function(error) {
-			// Auswertung fertigstellen
-			auswerten(auswertungsdaten);
+				// finish complete evaluation
+			classify(auswertungsdaten);
 	
 			response.render(params.nursummen ? "evaluation_result_summary.html" : "evaluation_result.html", 
 				{params: params, auswertungsdaten: auswertungsdaten});
@@ -1319,7 +1322,7 @@ function show(request, response) {
 	});
 }
 
-function auswerten(objekt) {
+function classify(objekt) {
 	if (objekt.summe_soll > 0) {
 		var abdeckung = objekt.summe_identisch / objekt.summe_soll;
 		objekt.abdeckung = Math.floor(1000 * abdeckung) / 10;
@@ -1349,7 +1352,7 @@ function auswerten(objekt) {
 
 exports.selectmunicipality = selectmunicipality;
 exports.selectevaluation = selectevaluation;
-exports.gpx_ausgeben = gpx_ausgeben;
-exports.offizielle_koordinaten_ausgeben = offizielle_koordinaten_ausgeben;
+exports.exportgpx = exportgpx;
+exports.exportofficialgeocoordinates = exportofficialgeocoordinates;
 exports.offizielle_koordinaten_abgleichen = offizielle_koordinaten_abgleichen;
 exports.show = show;
