@@ -33,10 +33,11 @@ handle["/de/auswertung_auswahlort"] = evaluation.selectmunicipality;
 handle["/de/auswertung_auswahldetails"] = evaluation.selectevaluation;
 handle["/en/selectevaluation"] = evaluation.selectevaluation;
 handle["/en/showevaluation"] = evaluation.show;
-
+handle["/de/gpx_ausgeben"] = evaluation.exportgpx;
+handle["/en/exportgpx"] = evaluation.exportgpx;
+handle["/offizielle_koordinaten_ausgeben"] = evaluation.exportofficialgeocoordinates;
+handle["/en/exportofficialgeocoordinates"] = evaluation.exportofficialgeocoordinates;
 /*
-					handle["/gpx_ausgeben"] = evaluation.gpx_ausgeben;
-					handle["/offizielle_koordinaten_ausgeben"] = evaluation.offizielle_koordinaten_ausgeben;
 					handle["/offizielle_koordinaten_abgleichen"] = evaluation.offizielle_koordinaten_abgleichen;
 
 					handle["/karte_auswahlort"] = grafikanforderung.ort_dialog;
