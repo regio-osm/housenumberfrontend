@@ -122,7 +122,7 @@
 		<h4>{{ __("Options") }}</h4>
 		<p><a target='gpxwindow' href='/housenumbers/evaluationinstantrequest?land={{ job.land }}&stadt={{ job.stadt }}&jobname={{ job.jobname }}'>{{ __("request instant evaluation now") }}</a></p>
 		<p><a target='gpxwindow' href='/housenumbers/strasse/ignorierte_liste?land={{ job.land }}&stadt={{ job.stadt }}&job_id={{ job.job_id }}'>{{ __("show list of ignored streets") }}</a></p>
-		<p><a target='gpxwindow' href='/housenumbers/hausnummer/ignorierte_liste?land={{ job.land }}&stadt={{ job.stadt }}&job_id={{ job.job_id }}'>{{ __("show list of ignored housenumbers") }}</a></p>
+		<p><a target='gpxwindow' href='/housenumbers/housenumber_ignorelist?country={{ job.countrycode }}&municipality={{ job.stadt }}&job_id={{ job.job_id }}'>{{ __("show list of ignored housenumbers") }}</a></p>
 		<p><a target='gpxwindow' href='/housenumbers/historischeentwicklung/grafik?job_id={{ job.job_id }}'>{{ __("show timeline progress in chart") }}</a></p>
 		{% if job.paralistcoordforevaluation == 'yes' %}
 			<p>{{ __("in OSM already existing housenumbers") }}: 
@@ -222,7 +222,7 @@
 					{% if hausnummer.hausnummer_bemerkung %}<a class="infohausnummer" ID='popup_info_{{ strasse.name }}_{{ hausnummer.hausnummer }}' class='{{ hausnummer.kommentar.typ }}' href="#" onmouseover="Popup.show('popup_notexist','popup_notexist_{{ strasse.name }}_{{ hausnummer.hausnummer }}','above center',{'constrainToScreen':true,'content':'{{ __("Official Note") }}: {{ hausnummer.hausnummer_bemerkung }}'});return false;">(I)</a>{% endif %}
 				{% endfor %}
 				{% if strasse.hausnummern_nurstadt.length && params.editieren %}
-					<a href='/housenumbers/hausnummer/details?job_id={{ job.job_id }}&strasse_id={{ strasse.strasse_id }}'>[{{ __("edit") }}]</a>
+					<a href='/housenumbers/housenumber_details?job_id={{ job.job_id }}&street_id={{ strasse.strasse_id }}'>[{{ __("edit") }}]</a>
 				{% endif %}
 			</td>
 			<td>

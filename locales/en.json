@@ -235,5 +235,8 @@
 	"'hide completed streets': hide streets, where all housenumbers are in OSM; 'hide streets only, if no OSM-only housenumbers exists': streets with alle housenumbers will still be shown, if housenumbers are in OSM, which are not on the official list; 'show all streets': don't hide streets regardless of their completeness": "'hide completed streets': hide streets, where all housenumbers are in OSM; 'hide streets only, if no OSM-only housenumbers exists': streets with alle housenumbers will still be shown, if housenumbers are in OSM, which are not on the official list; 'show all streets': don't hide streets regardless of their completeness",
 	"reduce output (for printing): 'hide..': identical housenumbers, if they are not important to look for; 'show..' don't hide columns": "reduce output (for printing): 'hide..': identical housenumbers, if they are not important to look for; 'show..' don't hide columns",
 	"display all pare housenumbers in only line, and impare housenumber in another line. Useful, if housenumbers are sorted in real in street": "display all pare housenumbers in only line, and impare housenumber in another line. Useful, if housenumbers are sorted in real in street",
-	"don't show results for every street, just show a summary": "don't show results for every street, just show a summary"
+	"don't show results for every street, just show a summary": "don't show results for every street, just show a summary",
+	"Housenumbers to ignore failed": "Housenumbers to ignore failed",
+	"The housenumbers were not stored, because a database store failure occured": "The housenumbers were not stored, because a database store failure occured",
+	"Technical Details": "Technical Details"
 }

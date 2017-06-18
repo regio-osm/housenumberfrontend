@@ -1,0 +1,21 @@
+<!-- original filename from private repo: /housenumbers/templates/hausnummer_ignorieren.html; version as of 2017-06-18 -->
+
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{ __("Housenumbers to ignore failed") }}{% endblock %}
+
+
+{% block content %}
+
+<p>{{  __("The housenumbers were not stored, because a database store failure occured") }}</p>
+<form action="/housenumbers/showevaluation" method="get">
+<input type="hidden" name="country" value="{{ params.countrycode }}">
+<input type="hidden" name="municipality" value="{{ params.municipality }}">
+<input type="hidden" name="job_ids" value="{{ params.jobid }}">
+<input type="hidden" name="edit" value="ja">
+<input type="submit" value="{{ __("ok") }}">
+</form>
+<p></p>
+<h3>{{ __("Technical Details") }}</h3>
+<p>{{ failtext }}</p>
+{% endblock %}

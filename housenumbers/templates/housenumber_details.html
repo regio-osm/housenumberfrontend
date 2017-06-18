@@ -1,0 +1,42 @@
+<!-- original filename from private repo: /housenumbers/templates/hausnummer_details.html; version as of 2017-06-18 -->
+
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{ housenumbers[0].strasse }}{% endblock %}
+
+
+{% block content %}
+<p>{{ __("If you want to exclude one ore more of the housenumbers listed below in future evaluations for a time period or permanent,") }}
+{{ __("mark the housenumbers, choose one listed reason or add an individual reason and select, how long the exclude should be activ") }}
+</p>
+<form action="/housenumbers/housenumber_ignore" method="get">
+{% for housenumber in housenumbers %}
+<input type="checkbox" name="housenumber" value="{{ housenumber.nummer }}">{{ housenumber.nummer }}<br>
+{% endfor %}
+<input type="hidden" name="street_id" value="{{ params.streetid }}">
+<input type="hidden" name="street" value="{{ housenumbers[0].strasse }}">
+<input type="hidden" name="country" value="{{ housenumbers[0].land }}">
+<input type="hidden" name="countrycode" value="{{ housenumbers[0].countrycode }}">
+<input type="hidden" name="municipality" value="{{ housenumbers[0].stadt }}">
+<input type="hidden" name="job_id" value="{{ params.jobid }}">
+<br>
+<select name="ignorereason" size="1">
+<option value="building_missing">{{ __("building doesn't exist") }}</option>
+<option value="housenumber_missing">{{ __("housenumber definitive missing") }}</option>
+<option value="building_abandoned">{{ __("building abandoned") }}</option>
+<option value="other" selected>{{ __("other reason") }}</option>
+</select>{{ __("Reason to exclude") }}
+<br>
+<textarea name="explicitreason" cols=60 rows=5></textarea>{{ __("other reason") }}
+<br>
+<select name="ignoreduration" size="1">
+<option value="3">3 {{ __("month") }}</option>
+<option value="6">6 {{ __("month") }}</option>
+<option value="12">12 {{ __("month") }}</option>
+<option value="9999">{{ __("permanent, please use only, if sure") }}</option>
+</select>{{ __("How long to exclude") }}
+<br>
+<input type="submit" value="{{ __("ignore in future evaluations") }}">
+<input type="reset" value="{{ __("cancel") }}">
+</form>
+{% endblock %}

@@ -1,6 +1,7 @@
 	// project specific references
 var ApplicationConfiguration = require("./housenumbers/Applicationconfiguration");
 var evaluation = require("./housenumbers/evaluation");
+var housenumber = require("./housenumbers/housenumber");
 /*
 					var theo_auswertung = require("./housenumbers/theoauswertung");
 					var grafikanforderung = require("./housenumbers/grafikanforderung");
@@ -8,7 +9,6 @@ var evaluation = require("./housenumbers/evaluation");
 					var notexisting_housenumbers_insert = require("./notexisting_housenumbers/insert_new"); 
 					var notexisting_housenumbers_get = require("./notexisting_housenumbers/get"); 
 					var strasse = require("./housenumbers/strasse");
-					var hausnummer = require("./housenumbers/hausnummer");
 					var statistik = require("./housenumbers/statistik");
 					var missionplaning = require("./housenumbers/missionplaning");
 					var api_getmissingstreetnumbers = require("./api/getmissingstreetnumbers");
@@ -37,6 +37,14 @@ handle["/de/gpx_ausgeben"] = evaluation.exportgpx;
 handle["/en/exportgpx"] = evaluation.exportgpx;
 handle["/offizielle_koordinaten_ausgeben"] = evaluation.exportofficialgeocoordinates;
 handle["/en/exportofficialgeocoordinates"] = evaluation.exportofficialgeocoordinates;
+handle["/de/hausnummer_details"] = housenumber.details;
+handle["/en/housenumber_details"] = housenumber.details;
+handle["/de/hausnummer_ignorieren"] = housenumber.ignore;
+handle["/en/housenumber_ignore"] = housenumber.ignore;
+handle["/de/hausnummer_ignorierteliste"] = housenumber.ignorelist;
+handle["/en/housenumber_ignorelist"] = housenumber.ignorelist;
+handle["/de/hausnummer_reaktivieren"] = housenumber.reactivate;
+handle["/en/housenumber_reactivate"] = housenumber.reactivate;
 /*
 					handle["/offizielle_koordinaten_abgleichen"] = evaluation.offizielle_koordinaten_abgleichen;
 
@@ -49,10 +57,6 @@ handle["/en/exportofficialgeocoordinates"] = evaluation.exportofficialgeocoordin
 					handle["/strasse/ignorieren"] = strasse.ignorieren;
 					handle["/strasse/ignorierte_liste"] = strasse.ignorierte_liste;
 					handle["/strasse/reaktivieren"] = strasse.reaktivieren;
-					handle["/hausnummer/details"] = hausnummer.details;
-					handle["/hausnummer/ignorieren"] = hausnummer.ignorieren;
-					handle["/hausnummer/ignorierte_liste"] = hausnummer.ignorierte_liste;
-					handle["/hausnummer/reaktivieren"] = hausnummer.reaktivieren;
 					handle["/statistik"] = statistik.show;
 					handle["/mission_show"] = missionplaning.show;
 					handle["/mission_route"] = missionplaning.route;
