@@ -364,7 +364,7 @@ function calculateCoordinateForAMissingHousenumber(strasse, strasseLonLat, hausn
 	var HAUSNUMMERNUNSETHIGH = 9999;
 	var HAUSNUMMERNUNSETLOW = -999;
 	
-	console.log("ok, Start Versuch, Hausnummer zu interpolieren für fehlende Hnr ===" + hausnummerFehlend + "===");
+	//console.log("ok, Start Versuch, Hausnummer zu interpolieren für fehlende Hnr ===" + hausnummerFehlend + "===");
 
 	var lonAufStrasse = 0.0;
 	var latAufStrasse = 0.0;
@@ -388,8 +388,8 @@ function calculateCoordinateForAMissingHousenumber(strasse, strasseLonLat, hausn
 
 	hausnummerPur = sb;
 	hausnummersuffix = hnrSuffixsb.trim();
-	console.log("Kalkulierungs-Hausnummer pur ===" + hausnummerPur + "===   Suffix ===" + hausnummersuffix 
-		+ "===,     Original war ===" + hausnummerFehlend + "===");
+	//console.log("Kalkulierungs-Hausnummer pur ===" + hausnummerPur + "===   Suffix ===" + hausnummersuffix 
+	//	+ "===,     Original war ===" + hausnummerFehlend + "===");
 
 	var hausnummerFehlendInteger = parseInt(hausnummerPur, 10);
 
@@ -712,7 +712,7 @@ function calculateCoordinateForAMissingHousenumber(strasse, strasseLonLat, hausn
 			//		+ ", aber nicht interpolierbar über Strategie unter-/oberhalb");
 		}
 	}
-	console.log("gesetzte Strategie: " + strategie);
+	//console.log("gesetzte Strategie: " + strategie);
 
 		// ============================================================================================
 		// ====================================== Unter/Oberhalb ======================================
@@ -749,7 +749,6 @@ function calculateCoordinateForAMissingHousenumber(strasse, strasseLonLat, hausn
 			// versuche es jetzt auf der gegenüberliegenden Straßenseite
 		if (	!loesungshausnummerSelbeSeiteWieSuchhausnummer 
 			&&	(strasseLonLat != "")) {
-////V1.5postgisif ( 1 == 0) {
 														// Sonderfall es wurden Hausnummern von der 
 														// gegenüberliegenden Straßenseite genommen, 
 														// also Ziel-Punkt an Straße spiegeln
@@ -798,7 +797,6 @@ function calculateCoordinateForAMissingHousenumber(strasse, strasseLonLat, hausn
 
 		if (	!loesungshausnummerSelbeSeiteWieSuchhausnummer 
 				&&	(strasseLonLat != "")) {
-////V1.5postgisif ( 1 == 0) {
 				// Sonderfall es wurden Hausnummern von der gegenüberliegenden Straßenseite genommen, 
 				// also Ziel-Punkt an Straße spiegeln
 			var diffLon = parseFloat(lonAufStrasse - neuLon);
@@ -1041,36 +1039,34 @@ function show(request, response) {
 	// TODO aktuellen Stand der DB zeigen durch auslesen state.txt
 
 		// get job details and newest evaluation for the job
-	var query_string = "SELECT osm_id as osm_relation_id,"
-		+ " ST_X(ST_Transform(ST_Centroid(gebiete.polygon),4326)) AS lon,"
-		+ " ST_Y(ST_Transform(ST_Centroid(gebiete.polygon),4326)) AS lat,"
-		+ " jobs.id AS job_id,"
-		+ " jobs.jobname AS jobname,"
-		+ " land.land, land.countrycode,"
-		+ " stadt.stadt,"
-		+ " stadt.officialgeocoordinates,"
-		+ " stadt.sourcelist_url AS sourcelist_url,"
-		+ " stadt.sourcelist_copyrighttext AS sourcelist_copyrighttext,"
-		+ " stadt.sourcelist_useagetext AS sourcelist_useagetext,"
-		+ " to_char(stadt.sourcelist_contentdate, 'DD.MM.YYYY') AS sourcelist_contentdate,"
-		+ " to_char(stadt.sourcelist_filedate, 'DD.MM.YYYY') AS sourcelist_filedate,"
-		+ " evaluation.tstamp,"
-		+ " evaluation.osmdb_tstamp,"
-		+ " stadt.parameters->'listcoordosmuploadable' AS paralistcoordosmuploadable,"
-		+ " stadt.parameters->'listcoordforevaluation' AS paralistcoordforevaluation"
-		+ " FROM"
-		+ " jobs" 
-		+ " JOIN gebiete ON jobs.gebiete_id = gebiete.id"
-		+ " JOIN land ON jobs.land_id = land.id"
-		+ " JOIN stadt ON jobs.stadt_id = stadt.id"
-		+ " LEFT JOIN"
-		+ "   (SELECT DISTINCT ON (job_id) * FROM evaluations"
-		+ "    WHERE number_target > 0"
-		+ "    ORDER BY job_id, id DESC) evaluation"
-		+ " ON jobs.id = evaluation.job_id"
-		+ " WHERE"
-		+ " land.countrycode = $1 AND stadt.stadt = $2 AND jobs.id = ANY($3::int[])"
-		+ " ORDER BY correctorder(jobs.jobname)";
+	var query_string = "SELECT osm_id as osm_relation_id, " +
+		"ST_X(ST_Transform(ST_Centroid(gebiete.polygon),4326)) AS lon, " +
+		"ST_Y(ST_Transform(ST_Centroid(gebiete.polygon),4326)) AS lat, " +
+		"jobs.id AS job_id, " +
+		"jobs.jobname AS jobname, " +
+		"land.land, land.countrycode, " +
+		"stadt.stadt, " +
+		"stadt.officialgeocoordinates, " +
+		"stadt.sourcelist_url AS sourcelist_url, " +
+		"stadt.sourcelist_copyrighttext AS sourcelist_copyrighttext, " +
+		"stadt.sourcelist_useagetext AS sourcelist_useagetext, " +
+		"to_char(stadt.sourcelist_contentdate, 'DD.MM.YYYY') AS sourcelist_contentdate, " +
+		"to_char(stadt.sourcelist_filedate, 'DD.MM.YYYY') AS sourcelist_filedate, " +
+		"evaluation.tstamp, " +
+		"evaluation.osmdb_tstamp, " +
+		"stadt.parameters->'listcoordosmuploadable' AS paralistcoordosmuploadable, " +
+		"stadt.parameters->'listcoordforevaluation' AS paralistcoordforevaluation " +
+		"FROM jobs JOIN gebiete ON jobs.gebiete_id = gebiete.id " +
+		"JOIN land ON jobs.land_id = land.id " +
+		"JOIN stadt ON jobs.stadt_id = stadt.id " +
+		"LEFT JOIN " +
+		"  (SELECT DISTINCT ON (job_id) * FROM evaluations " +
+		"  WHERE number_target > 0 " +
+		"   ORDER BY job_id, id DESC) evaluation " +
+		"  ON jobs.id = evaluation.job_id " +
+		"WHERE " +
+		"land.countrycode = $1 AND stadt.stadt = $2 AND jobs.id = ANY($3::int[])" + 
+		"ORDER BY correctorder(jobs.jobname)";
 
 	console.log("query for evaluation ===" + query_string + "===");
 	console.log("parameter 1 ===" + params.countrycode + "===");
@@ -1129,50 +1125,45 @@ function show(request, response) {
 			// TODO aktuell - das Array notexistinghousenumbers_result weiter unten bei treffertyp i und s berücksichtigen und einblenden bzw. ausblenden
 
 				// get all housenumbers from newest evaluation, including ignored not-existing housenumbers as ignore.*
-			var query_hnr_string = "SELECT"
-				+ "   auswertung_hausnummern.id AS auswertung_hausnummern_id,"
-				+ "   strasse.strasse,"
-				+ "   strasse.id AS strasse_id,"
-				+ "   auswertung_hausnummern.hausnummer,"
-				+ "   auswertung_hausnummern.treffertyp,"
-				+ "   auswertung_hausnummern.osm_objektart,"
-				+ "   auswertung_hausnummern.osm_id,"
-				+ "   auswertung_hausnummern.hausnummer_bemerkung,"
-				+ "   jobs_strassen.osm_ids AS osm_strassen_ids,"
-				+ "   ST_X(ST_Transform(ST_ClosestPoint(jobs_strassen.linestring,ST_Centroid(jobs_strassen.linestring)),4326)) AS lon,"
-				+ "   ST_Y(ST_Transform(ST_ClosestPoint(jobs_strassen.linestring,ST_Centroid(jobs_strassen.linestring)),4326)) AS lat,"
-				+ "   ST_X(point) AS hnr_lon,"
-				+ "   ST_Y(point) AS hnr_lat,"
-				+ "   auswertung_hausnummern.pointsource,"
-				+ "   ignore.housenumber IS NOT NULL AS ignoriert,"
-				+ "   ignore.reason AS ignoriert_begruendung,"
-				+ "   to_char(ignore.nextcheckdate, 'DD.MM.YYYY') AS ignoriert_nextcheckdate"
-				+ " FROM auswertung_hausnummern"
-				+ " JOIN strasse"
-				+ "   ON auswertung_hausnummern.strasse_id = strasse.id"
-				+ " JOIN jobs"
-				+ "   ON auswertung_hausnummern.job_id = jobs.id AND"
-				+ "      auswertung_hausnummern.land_id = jobs.land_id AND"
-				+ "      auswertung_hausnummern.stadt_id = jobs.stadt_id"
-				+ " LEFT JOIN jobs_strassen"
-				+ "   ON auswertung_hausnummern.strasse_id = jobs_strassen.strasse_id AND"
-				+ "      jobs.id = jobs_strassen.job_id"
-				+ " JOIN gebiete"
-				+ "   ON jobs.gebiete_id = gebiete.id"
-				+ " JOIN land"
-				+ "   ON auswertung_hausnummern.land_id = land.id"
-				+ " LEFT JOIN (SELECT DISTINCT ON (street, housenumber) *"
-				+ "            FROM notexisting_housenumbers"
-				+ "            WHERE country = $2"
-				+ "            AND city = $3"
-				+ "            AND current_date < nextcheckdate"
-				+ "            ORDER BY street, housenumber, nextcheckdate DESC) ignore"
-				+ "   ON strasse.strasse = ignore.street AND"
-				+ "      land.land = ignore.country AND"
-				+ "      auswertung_hausnummern.hausnummer = ignore.housenumber"
-				+ " WHERE"
-				+ "   jobs.id = $1"
-				+ " ORDER BY correctorder(strasse.strasse), hausnummer_sortierbar;";
+			var query_hnr_string = "SELECT " +
+				"auswertung_hausnummern.id AS auswertung_hausnummern_id, " + 
+				"strasse.strasse, " +
+				"strasse.id AS strasse_id, " +
+				"auswertung_hausnummern.hausnummer, " +
+				"auswertung_hausnummern.treffertyp, " +
+				"auswertung_hausnummern.osm_objektart, " +
+				"auswertung_hausnummern.osm_id, " +
+				"auswertung_hausnummern.hausnummer_bemerkung, " +
+				"jobs_strassen.osm_ids AS osm_strassen_ids, " +
+				"ST_X(ST_Transform(ST_ClosestPoint(jobs_strassen.linestring,ST_Centroid(jobs_strassen.linestring)),4326)) AS lon, " +
+				"ST_Y(ST_Transform(ST_ClosestPoint(jobs_strassen.linestring,ST_Centroid(jobs_strassen.linestring)),4326)) AS lat, " +
+				"ST_X(point) AS hnr_lon, " + 
+				"ST_Y(point) AS hnr_lat, " +
+				"auswertung_hausnummern.pointsource, " +
+				"ignore.housenumber IS NOT NULL AS ignoriert, " +
+				"ignore.reason AS ignoriert_begruendung, " +
+				"to_char(ignore.nextcheckdate, 'DD.MM.YYYY') AS ignoriert_nextcheckdate " +
+				"FROM auswertung_hausnummern " +
+				"JOIN strasse ON auswertung_hausnummern.strasse_id = strasse.id " +
+				"JOIN jobs ON auswertung_hausnummern.job_id = jobs.id AND " +
+				"     auswertung_hausnummern.land_id = jobs.land_id AND " +
+				"     auswertung_hausnummern.stadt_id = jobs.stadt_id " +
+				"LEFT JOIN jobs_strassen " +
+				"  ON auswertung_hausnummern.strasse_id = jobs_strassen.strasse_id AND " +
+				"     jobs.id = jobs_strassen.job_id " +
+				"JOIN gebiete ON jobs.gebiete_id = gebiete.id " +
+				"JOIN land ON auswertung_hausnummern.land_id = land.id " +
+				"LEFT JOIN (SELECT DISTINCT ON (street, housenumber) * " +
+				"           FROM notexisting_housenumbers " +
+				"           WHERE country = $2 " +
+				"           AND city = $3 " +
+				"           AND current_date < nextcheckdate " +
+				"           ORDER BY street, housenumber, nextcheckdate DESC) ignore " +
+				"  ON strasse.strasse = ignore.street AND " +
+				"     land.land = ignore.country AND " +
+				"     auswertung_hausnummern.hausnummer = ignore.housenumber " +
+				"WHERE jobs.id = $1 " +
+				"ORDER BY correctorder(strasse.strasse), hausnummer_sortierbar;";
 
 			var strasse;
 

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml"
+  xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
+  <NamedLayer>
+    <Name>Abdeckung</Name>
+    <UserStyle>
+      <Name>hnr_abdeck</Name>
+      <Title>Housenumber Evaluation Overview, filtered</Title>
+      <Abstract>show housenumber evaluation results in overview, with labels and filtered for only one country</Abstract>
+      <FeatureTypeStyle>
+        <Rule>
+          <Title>&lt; 25%</Title>
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsLessThan>
+               <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+               <ogc:Literal>25</ogc:Literal>
+              </ogc:PropertyIsLessThan>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#B10026</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+        <Rule>
+          <Title>25% .. 50%</Title>
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsBetween>
+                <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+                <ogc:LowerBoundary>
+                  <ogc:Literal>25</ogc:Literal>
+                </ogc:LowerBoundary>
+                <ogc:UpperBoundary>
+                  <ogc:Literal>50</ogc:Literal>
+                </ogc:UpperBoundary>
+              </ogc:PropertyIsBetween>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#E31A1C</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+        <Rule>
+          <Title>50% .. 75%</Title>
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsBetween>
+                <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+                <ogc:LowerBoundary>
+                  <ogc:Literal>50</ogc:Literal>
+                </ogc:LowerBoundary>
+                <ogc:UpperBoundary>
+                  <ogc:Literal>75</ogc:Literal>
+                </ogc:UpperBoundary>
+              </ogc:PropertyIsBetween>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#FC4E2A</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+        <Rule>
+          <Title>75% .. 85%</Title>
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsBetween>
+                <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+                <ogc:LowerBoundary>
+                  <ogc:Literal>75</ogc:Literal>
+                </ogc:LowerBoundary>
+                <ogc:UpperBoundary>
+                  <ogc:Literal>85</ogc:Literal>
+                </ogc:UpperBoundary>
+              </ogc:PropertyIsBetween>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#FD8D3C</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+        <Rule>
+          <Title>85% .. 95%</Title>
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsBetween>
+                <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+                <ogc:LowerBoundary>
+                  <ogc:Literal>85</ogc:Literal>
+                </ogc:LowerBoundary>
+                <ogc:UpperBoundary>
+                  <ogc:Literal>95</ogc:Literal>
+                </ogc:UpperBoundary>
+              </ogc:PropertyIsBetween>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#FEB24C</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+        <Rule>
+          <Title>95% .. 99%</Title>
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsBetween>
+                <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+                <ogc:LowerBoundary>
+                  <ogc:Literal>95</ogc:Literal>
+                </ogc:LowerBoundary>
+                <ogc:UpperBoundary>
+                  <ogc:Literal>99</ogc:Literal>
+                </ogc:UpperBoundary>
+              </ogc:PropertyIsBetween>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#FED976</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+        <Rule>
+          <Title>&gt; 99</Title>
+          <!-- like a linesymbolizer but with a fill too -->
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsGreaterThan>
+               <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+               <ogc:Literal>99</ogc:Literal>
+              </ogc:PropertyIsGreaterThan>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>countrycode</ogc:PropertyName>
+                <ogc:Function name="env">
+                  <ogc:Literal>countryfilter</ogc:Literal>
+                </ogc:Function>
+              </ogc:PropertyIsEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>240000000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+             <Fill>
+                <!-- CssParameters allowed are fill (the color) and fill-opacity -->
+                <CssParameter name="fill">#FFFFB2</CssParameter>
+             </Fill>     
+          </PolygonSymbolizer>
+        </Rule>
+            <!-- label -->     
+        <Rule>
+      <MinScaleDenominator>100000</MinScaleDenominator>
+      <MaxScaleDenominator>400000</MaxScaleDenominator>
+          <TextSymbolizer>
+            <Label>
+              <ogc:Function name="round">
+                <ogc:PropertyName>hnr_abdeck</ogc:PropertyName>
+              </ogc:Function>%
+            </Label>
+             <Font>
+              <CssParameter name="font-family">Times New Roman</CssParameter>
+              <CssParameter name="font-style">Normal</CssParameter>
+              <CssParameter name="font-size">14</CssParameter>
+              <CssParameter name="font-weight">bold</CssParameter>
+            </Font>
+            <LabelPlacement>
+              <PointPlacement>
+                <AnchorPoint>
+                  <AnchorPointX>0.5</AnchorPointX>
+                  <AnchorPointY>0.5</AnchorPointY>
+                </AnchorPoint>
+              </PointPlacement>
+            </LabelPlacement>     
+          </TextSymbolizer>
+        </Rule>
+      </FeatureTypeStyle>
+     <FeatureTypeStyle>
+        <Rule>    
+          <MinScaleDenominator>100000</MinScaleDenominator>
+          <MaxScaleDenominator>1000000</MaxScaleDenominator>
+          <LineSymbolizer>
+             <Stroke>
+              <CssParameter name="stroke">#000000</CssParameter>
+              <CssParameter name="stroke-width">1</CssParameter>
+            </Stroke>
+          </LineSymbolizer>
+        </Rule>  
+     </FeatureTypeStyle>
+    </UserStyle>
+    </NamedLayer>
+</StyledLayerDescriptor>
