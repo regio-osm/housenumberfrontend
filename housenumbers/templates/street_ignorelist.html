@@ -1,0 +1,31 @@
+<!-- original filename from private repo: /housenumbers/templates/strasse_ignorierte_liste.html; version as of 2017-06-18 -->
+
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{ __("ignored streets") }}{% if jobname %} {{ __("in") }} {{ jobname }}{% endif %}{% endblock %}
+
+
+{% block content %}
+{% if streets.length > 0 %}
+	<form action="/housenumbers/street_reactivate" method="get">
+	{% for street in streets %}
+		<input type="checkbox" name="ignorierid" value="{{ street.ignorierte_strasse_recordid }}">
+		{{ street.strasse }}  <a target="new" href="http://www.openstreetmap.org/?way={{ street.osm_ids }}">{{ __("Way on OSM map") }}</a><br>
+	{% endfor %}
+		<input type="hidden" name="country" value="{{ params.countrycode }}">
+		<input type="hidden" name="municipality" value="{{ params.municipality }}">
+		<input type="hidden" name="job_id" value="{{ params.jobid }}">
+		<br>
+		<input type="submit" value="{{ __("reactivate marked street segments") }}">
+		<input type="reset" onclick = "document.location.href='/housenumbers/showevaluation?country={{ params.countrycode }}&municipality={{ params.municipality }}&job_ids={{ params.jobid }}'" value="{{ __("cancel") }}">
+	</form>
+{% else %}	
+	<form action="/housenumbers/showevaluation" method="get">
+		<p>{{ __("There are no ignored streets in this area") }}</p>
+		<input type="hidden" name="country" value="{{ params.countrycode }}">
+		<input type="hidden" name="municipality" value="{{ params.municipality }}">
+		<input type="hidden" name="job_ids" value="{{ params.jobid }}">
+		<input type="submit" value="{{ __("ok") }}">
+	</form>
+{% endif %}
+{% endblock %}

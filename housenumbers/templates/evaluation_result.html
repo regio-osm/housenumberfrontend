@@ -184,7 +184,7 @@
 			{% endif %}
 			{% if params.editieren %}
 				{% if strasse.lon %}
-				<a target='new' href='./strasse/details?land={{ job.land }}&stadt={{ job.stadt }}&job_id={{ job.job_id }}&strasse_id={{ strasse.strasse_id }}'>[{{ __("edit") }}]</a>
+				<a target='new' href='/housenumbers/street/details?country={{ job.countrycode }}&municipality={{ job.stadt }}&job_id={{ job.job_id }}&street_id={{ strasse.strasse_id }}'>[{{ __("edit") }}]</a>
 				{% endif %}
 			{% endif %}
 			</td>

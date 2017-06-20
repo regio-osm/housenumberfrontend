@@ -1,0 +1,25 @@
+<!-- original filename from private repo: /housenumbers/templates/strasse_details.html; version as of 2017-06-18 -->
+
+{% extends 'pagelayout.html' %}
+
+{% block title %}{{segments[0].strasse}}{% endblock %}
+
+
+{% block content %}
+<p>{{ __("If you mark the street segments below, they will not be part of the future evaluations.") }}<br>
+{{ __("You do this, if the street segments have a street name, but they don't represent the official street.") }}<br>
+{{ __("If there is more than one street segment, you normally should mark all to ignore") }}
+</p>
+<form action="/housenumbers/street_ignore" method="get">
+{% for segment in segments %}
+<input type="checkbox" name="osmid" value="{{ segment.id }}">
+<a target="new" href="http://www.openstreetmap.org/?way={{ segment.id }}">{{ segment.id }}</a><br>
+{% endfor %}
+<input type="hidden" name="country" value="{{ params.countrycode }}">
+<input type="hidden" name="municipality" value="{{ params.municipality }}">
+<input type="hidden" name="job_id" value="{{ params.jobid }}">
+<input type="hidden" name="street_id" value="{{ params.streetid }}">
+<input type="submit" value="{{ __("ignore in future evaluations") }}">
+<input type="reset" value="{{ __("cancel") }}">
+</form>
+{% endblock %}
