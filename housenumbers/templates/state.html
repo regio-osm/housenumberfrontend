@@ -1,0 +1,100 @@
+<!-- original filename from private repo: /housenumbers/templates/state.html; version as of 2017-06-25 -->
+
+<!-- TODO localize Text output -->
+{% extends 'pagelayout.html' %}
+
+<!-- popup dialog concept see http://www.javascripttoolbox.com/lib/popup/example.php -->
+
+{% block headerscripts %}
+	<script type="text/javascript" src="/housenumbers/js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/jquery-ui-1.11.2.min.js"></script>
+	    <style>
+				.service_ok  {
+					background-color:	#00FF00;
+				}
+				.service_warning  {
+					background-color:	yellow;
+				}
+				.service_failure  {
+					background-color:	red;
+				}
+	    </style>
+	    
+		<script type="text/JavaScript">
+			function TimedRefresh( t ) {
+				setTimeout("location.reload(true);", t);
+			}
+		</script>
+{% endblock %}
+
+{% block title %}{{titel}}{% endblock %}
+
+{% block content %}
+	<script>
+		$(document).ready(function () {
+			TimedRefresh(60000);
+		});
+	</script>
+
+<h3>Housenumberclients on regio-osm.de</h3>
+<table border="all">
+	<tr>
+		<th>State</th>
+		<th>Theme</th>
+		<th>Count</th>
+		<th>Date</th>
+	</tr>
+	<tr>
+		<td{% if data.housenumberclientregularactive.class %} class="{{data.housenumberclientregularactive.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.housenumberclientregularactive.theme }}</td>
+		<td>&nbsp;</td>
+		<td>{% if data.housenumberclientregularactive.date %} {{ data.housenumberclientregularactive.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+	<tr>
+		<td{% if data.housenumberclientregularfinished.class %} class="{{data.housenumberclientregularfinished.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.housenumberclientregularfinished.theme }}</td>
+		<td>&nbsp;</td>
+		<td>{% if data.housenumberclientregularfinished.date %} {{ data.housenumberclientregularfinished.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+	<tr>
+		<td{% if data.regularopenresultfiles.class %} class="{{data.regularopenresultfiles.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.regularopenresultfiles.theme }}</td>
+		<td>{{ data.regularopenresultfiles.count }}</td>
+		<td>{% if data.regularopenresultfiles.date %} {{ data.regularopenresultfiles.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+	<tr>
+		<td{% if data.housenumberclientinstantactive.class %} class="{{data.housenumberclientinstantactive.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.housenumberclientinstantactive.theme }}</td>
+		<td>&nbsp;</td>
+		<td>{% if data.housenumberclientinstantactive.date %} {{ data.housenumberclientinstantactive.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+	<tr>
+		<td{% if data.housenumberclientinstantfinished.class %} class="{{data.housenumberclientinstantfinished.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.housenumberclientinstantfinished.theme }}</td>
+		<td>&nbsp;</td>
+		<td>{% if data.housenumberclientinstantfinished.date %} {{ data.housenumberclientinstantfinished.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+	<tr>
+		<td{% if data.instantopenresultfiles.class %} class="{{data.instantopenresultfiles.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.instantopenresultfiles.theme }}</td>
+		<td>{{ data.instantopenresultfiles.count }}</td>
+		<td>{% if data.instantopenresultfiles.date %} {{ data.instantopenresultfiles.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+</table>
+
+<h3>Other services on regio-osm.de</h3>
+<table border="all">
+	<tr>
+		<th>State</th>
+		<th>Theme</th>
+		<th>Count</th>
+		<th>Date</th>
+	</tr>
+	<tr>
+		<td{% if data.osmdb1.class %} class="{{data.osmdb1.class}}"{% endif %}>&nbsp;&nbsp;&nbsp;</td>
+		<td>{{ data.osmdb1.theme }}</td>
+		<td>&nbsp;</td>
+		<td>{% if data.osmdb1.date %} {{ data.osmdb1.date|date('d.m.Y H:i:s') }}{% else %}-{% endif %}</td>
+	</tr>
+</table>
+{% endblock %}

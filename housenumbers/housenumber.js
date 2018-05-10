@@ -16,7 +16,9 @@ function details(request, response) {
 		console.log("in hausnummer.js/details: params["+parami+"]===" + params[parami] + "===");
 	}
 
-	var query_string = "SELECT land, countrycode, stadt, strasse, hausnummer as nummer, objektart, osm_objektart, osm_id " +
+	var query_string = "SELECT land AS country, countrycode, " +
+		"stadt AS municipality, strasse AS street, hausnummer as housenumber, " +
+		"objektart AS objecttype, osm_objektart AS osmobjecttyp, osm_id " +
 		"FROM auswertung_hausnummern AS ah JOIN jobs ON ah.job_id = jobs.id " +
 		"JOIN land ON jobs.land_id = land.id " +
 		"JOIN stadt ON jobs.stadt_id = stadt.id " +
@@ -31,7 +33,8 @@ function details(request, response) {
 	function(error, result) {
 		console.log("in housenumber/details query was ===" + query_string + "===");
 		console.log("  count of housenumber rows: " + result.rows.length);
-		response.render("housenumber_details.html", {params: params, housenumbers: result && result.rows});
+
+		response.render("housenumber_details.html", {params: params, housenumbers: result.rows});
 
 		console.timeEnd("housenumber/details");
 	});
