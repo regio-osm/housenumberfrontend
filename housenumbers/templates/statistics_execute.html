@@ -1,0 +1,92 @@
+<!-- original filename from private repo: /housenumbers/templates/statistik_execute.html; version as of 2017-06-25 -->
+
+<!-- TODO localize Text output -->
+
+{% extends 'pagelayout.html' %}
+
+<!-- popup dialog concept see http://www.javascripttoolbox.com/lib/popup/example.php -->
+
+{% block headerscripts %}
+	<link rel="stylesheet" type="text/css" href="/housenumbers/css/tablesorter.css">
+	<script type="text/javascript" src="/housenumbers/js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="/housenumbers/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript">
+	function getTextExtractor() {
+		return (function() {
+			var patternLetters = /[öäüÖÄÜáàâéèêúùûóòôÁÀÂÉÈÊÚÙÛÓÒÔßÐðÍíÝýÞþÆæ]/g;
+			var patternDateDmy = /^(?:\D+)?(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/;
+			var lookupLetters = {
+				"ä": "a", "ö": "o", "ü": "u",
+				"Ä": "A", "Ö": "O", "Ü": "U",
+				"á": "a", "à": "a", "â": "a",
+				"é": "e", "è": "e", "ê": "e",
+				"ú": "u", "ù": "u", "û": "u",
+				"ó": "o", "ò": "o", "ô": "o",
+				"Á": "A", "À": "A", "Â": "A",
+				"É": "E", "È": "E", "Ê": "E",
+				"Ú": "U", "Ù": "U", "Û": "U",
+				"Ó": "O", "Ò": "O", "Ô": "O",
+				"ß": "s",
+				"Ð": "DZZ", "ð": "dzz", 			// iceland chars
+				"Í": "IZZ", "í": "izz", 			// iceland chars
+				"Ý": "YZZ", "ý": "yzz", 			// iceland chars
+				"Þ": "ZZZ1", "þ": "zzz1",			// iceland chars
+				"Æ": "ZZZ2", "æ": "zzz2"			// iceland chars
+			};
+			var letterTranslator = function(match) { 
+				return lookupLetters[match] || match;
+			}
+	
+		    return function(node) {
+		      var text = $.trim($(node).text());
+		      var date = text.match(patternDateDmy);
+		      if (date)
+		        return [date[3], date[2], date[1]].join("-");
+		      else
+		        return text.replace(patternLetters, letterTranslator);
+		    }
+		  })();
+		}
+	</script>
+{% endblock %}
+
+{% block title %}{{titel}}{% endblock %}
+
+{% block content %}
+
+<table id="statistiktabelle" class="tablesorter" border="all">
+<thead>
+<tr>
+<th>Stadt</th>
+<th>Gemeinde-ID</th>
+<th>Anzahl Hausnummern</th>
+<th>Bevölkerungszahl</th>
+<th>Fläche km/2</th>
+</tr>
+</thead>
+<tbody>
+{% for stadt in auswertungsdaten.staedte %}
+<tr>
+	<td>{{ stadt.stadt }}</td>
+	<td>{{ stadt.gemeinde_id }}</td>
+	<td>{{ stadt.anzahladressen }}</td>
+	<td>{{ stadt.bevoelkerungszahl }}</td>
+	<td>{{ stadt.flaechekm2 }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<script type="text/javascript">
+var myTextExtraction = function(node)
+{
+								// extract data from markup and return it"; 
+var inhalt = node.childNodes[0].childNodes[0].innerHTML;
+return inhalt;
+}
+$(document).ready(function()
+   {
+       $("#statistiktabelle").tablesorter(  {textExtraction: getTextExtractor()}); 
+   });
+</script>
+
+{% endblock %}

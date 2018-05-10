@@ -186,6 +186,8 @@ function exportofficialgeocoordinates(request, response) {
 			console.log("Forts. "+err.toString());
 		}
 
+		var paralistcoordosmuploadlimitcount = 500;
+		
 		var query_string = "SELECT sh.id AS sh_id, ST_X(sh.point) AS lon, ST_Y(sh.point) AS lat,"
 			+ " stadt, sh.postcode, strasse, sh.hausnummer AS hausnummer, officialgeocoordinates,"
 			+ " parameters->'listcoordosmuploadable' AS paralistcoordosmuploadable,"
@@ -198,15 +200,15 @@ function exportofficialgeocoordinates(request, response) {
 			+ " ah.hausnummer = sh.hausnummer"
 			+ " WHERE ah.job_id = $1"
 			+ " AND treffertyp = 'l'"
-			+ " ORDER BY strasse, sh.hausnummer_sortierbar;";
+			+ " ORDER BY strasse, sh.hausnummer_sortierbar LIMIT $2;";
 		console.log("query_string ==="+query_string+"===");
 		console.log("params.job_id ==="+params.job_id+"===");
 		var hausnummern = [];
 
-		var query_hnr = client.query({name: "hnr_koordinaten", text: query_string, values: [params.job_id]});
+		var query_hnr = client.query({name: "hnr_koordinaten", text: query_string, 
+			values: [params.job_id, paralistcoordosmuploadlimitcount]});
 		var osmnodeid = -1;
 		var paralistcoordosmuploadable;
-		var paralistcoordosmuploadlimitcount = 2000;
 		var counthousenumbers= 0;
 
 		query_hnr.on("row",function(row) {
@@ -219,8 +221,8 @@ function exportofficialgeocoordinates(request, response) {
 				paralistcoordosmuploadlimitcount = 0 + row.paralistcoordosmuploadlimitcount;
 
 			if(row.lon != null) {
-				if(		(row.officialgeocoordinates == "y")
-					||	((row.paralistcoordosmuploadable == "yes") && (paralistcoordosmuploadlimitcount < counthousenumbers))) {
+				if(	((row.officialgeocoordinates == "y") ||	(row.paralistcoordosmuploadable == "yes")) && 
+					(counthousenumbers < paralistcoordosmuploadlimitcount)) {
 					counthousenumbers++;
 					row['id'] = osmnodeid--;
 					hausnummern.push(row);
@@ -238,11 +240,12 @@ function exportofficialgeocoordinates(request, response) {
 				var hnr = hausnummern[hnrindex];
 				counthousenumbers++;
 				if(		(paralistcoordosmuploadlimitcount != undefined)
-					&&	(paralistcoordosmuploadlimitcount < counthousenumbers))
+					&&	(counthousenumbers < paralistcoordosmuploadlimitcount))
 					break;
 				osmfilecontent += "<node id='" + hnr.id + "' action='modify' visible='true' lat='" + hnr.lat + "' lon='" + hnr.lon + "'>";
-				osmfilecontent += "<tag k='addr:city' v='" + hnr.stadt + "' />";
-				if(hnr.postcode)
+				//deactivated 2018-04-14, because municipality name is mostly not wanted in addr:city
+				//osmfilecontent += "<tag k='addr:city' v='" + hnr.stadt + "' />";
+				if(hnr.postcode != undefined)
 					osmfilecontent += "<tag k='addr:postcode' v='" + hnr.postcode + "' />";
 				osmfilecontent += "<tag k='addr:street' v='" + hnr.strasse + "' />";
 				osmfilecontent += "<tag k='addr:housenumber' v='" + hnr.hausnummer + "' />";
@@ -1246,7 +1249,6 @@ function show(request, response) {
 					strasse["hausnummern_" + liste].push(hausnummer);
 					strasse["hausnummern_" + liste + "_" + suffix].push(hausnummer);
 				});
-				console.timeEnd("hnr-query");
 
 				job.strassen.forEach(function(strasse) {
 						// finish street
