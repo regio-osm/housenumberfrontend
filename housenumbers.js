@@ -3,17 +3,18 @@ var ApplicationConfiguration = require("./housenumbers/Applicationconfiguration"
 var evaluation = require("./housenumbers/evaluation");
 var housenumber = require("./housenumbers/housenumber");
 var street = require("./housenumbers/street");
+var state = require("./housenumbers/state");
+var statistics = require("./housenumbers/statistics");
+
 /*
 					var theo_auswertung = require("./housenumbers/theoauswertung");
 					var grafikanforderung = require("./housenumbers/grafikanforderung");
 					var historischeentwicklung = require("./housenumbers/historischeentwicklung");
 					var notexisting_housenumbers_insert = require("./notexisting_housenumbers/insert_new"); 
 					var notexisting_housenumbers_get = require("./notexisting_housenumbers/get"); 
-					var statistik = require("./housenumbers/statistik");
 					var missionplaning = require("./housenumbers/missionplaning");
 					var api_getmissingstreetnumbers = require("./api/getmissingstreetnumbers");
 					var jobqueue = require("./housenumbers/jobqueue");
-					var state = require("./housenumbers/state");
 */
 
 	// standard node.js addons
@@ -54,26 +55,26 @@ handle["/en/street_ignorelist"] = street.ignorelist;
 handle["/de/strasse/reaktivieren"] = street.reactivate;
 handle["/de/strasse_reaktivieren"] = street.reactivate;
 handle["/en/street_reactivate"] = street.reactivate;
+handle["/de/state"] = state.show;				// fix english text output
+handle["/en/state"] = state.show;				// fix english text output
+handle["/de/statistik"] = statistics.show;		// still not working
+handle["/en/statistics"] = statistics.show;		// still not working
 
 /*
 					handle["/offizielle_koordinaten_abgleichen"] = evaluation.offizielle_koordinaten_abgleichen;
-
 					handle["/karte_auswahlort"] = grafikanforderung.ort_dialog;
 					handle["/theoreticalevaluation"] = grafikanforderung.theoevaluation;
 					handle["/historischeentwicklung/grafik"] = historischeentwicklung.show;
 					handle["/notexisting_housenumbers/insert_new"] = notexisting_housenumbers_insert.insert_new;
 					handle["/notexisting_housenumbers/get_around_pos"] = notexisting_housenumbers_get.around_pos;
-					handle["/strasse/reaktivieren"] = strasse.reaktivieren;
-					handle["/statistik"] = statistik.show;
-					handle["/mission_show"] = missionplaning.show;
-					handle["/mission_route"] = missionplaning.route;
+								handle["/mission_show"] = missionplaning.show;
+								handle["/mission_route"] = missionplaning.route;
 					handle["/nextopenjobs"] = jobqueue.nextOpenJobs;
 					handle["/nextopenjobshierarchy"] = jobqueue.nextOpenJobsHierarchy;
 					handle["/evaluationinstantrequest"] = jobqueue.requestInstantJob;
 					handle["/theoretische_auswertung_anzeigen"] = theo_auswertung.show;
-					handle["/state"] = state.show;
 
-					handle["/api/getmissingstreetnumbers"] = api_getmissingstreetnumbers.request;
+								handle["/api/getmissingstreetnumbers"] = api_getmissingstreetnumbers.request;
 */
 
 

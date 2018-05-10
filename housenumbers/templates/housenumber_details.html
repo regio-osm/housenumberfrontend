@@ -2,22 +2,25 @@
 
 {% extends 'pagelayout.html' %}
 
-{% block title %}{{ housenumbers[0].strasse }}{% endblock %}
+{% block title %}{% for housenumber in housenumbers %}{% if housenumber.first %}{ housenumber.street }}{% endif %}{% endfor %}{% endblock %}
 
 
 {% block content %}
 <p>{{ __("If you want to exclude one ore more of the housenumbers listed below in future evaluations for a time period or permanent,") }}
-{{ __("mark the housenumbers, choose one listed reason or add an individual reason and select, how long the exclude should be activ") }}
+{{ __("mark the housenumbers, choose one listed reason or add an individual reason and select, how long the exclude should be active") }}
 </p>
 <form action="/housenumbers/housenumber_ignore" method="get">
 {% for housenumber in housenumbers %}
-<input type="checkbox" name="housenumber" value="{{ housenumber.nummer }}">{{ housenumber.nummer }}<br>
+<input type="checkbox" name="housenumber" value="{{ housenumber.housenumber }}">{{ housenumber.housenumber }}<br>
+{% if hausnummmer.first %}
+<input type="hidden" name="street" value="{{ housenumber.street }}">
+<input type="hidden" name="country" value="{{ housenumber.country }}">
+<input type="hidden" name="countrycode" value="{{ housenumber.countrycode }}">
+<input type="hidden" name="municipality" value="{{ housenumber.municipality }}">
+{% endif %}
 {% endfor %}
+{% if housenumbers.length > 0 %}
 <input type="hidden" name="street_id" value="{{ params.streetid }}">
-<input type="hidden" name="street" value="{{ housenumbers[0].strasse }}">
-<input type="hidden" name="country" value="{{ housenumbers[0].land }}">
-<input type="hidden" name="countrycode" value="{{ housenumbers[0].countrycode }}">
-<input type="hidden" name="municipality" value="{{ housenumbers[0].stadt }}">
 <input type="hidden" name="job_id" value="{{ params.jobid }}">
 <br>
 <select name="ignorereason" size="1">
@@ -37,6 +40,9 @@
 </select>{{ __("How long to exclude") }}
 <br>
 <input type="submit" value="{{ __("ignore in future evaluations") }}">
+{% else %}
+<p>{{__("sorry, no housenumbers found for your selected road")}}</p>
+{% endif %}
 <input type="reset" value="{{ __("cancel") }}">
 </form>
 {% endblock %}
