@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml">
+<head>
+	<title>OSM Test</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	
+	
+	<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+	<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+	<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+	<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>	
+
+	<script src="../../public_html/js/jquery-3.1.1.min.js"></script>
+	<script src="../../public_html/js/jquery-ui-1.11.2.min.js"></script>
+	
+	<style>
+	#framecontainer { 
+		position: absolute; 
+		left: 0px;
+		top: 0px;
+		right: 0px;
+		bottom: 0px;
+		margin: auto;
+		overflow: hidden;
+		background-color: white;
+		z-index: 1;
+	}
+	#frametop { 
+		position: relative; 
+		top: 0px; 
+		left: 0px; 
+		height: 50px;
+		width: 100%;
+		z-index: 4;
+	}
+	#framecontent { 
+		position: relative; 
+		top: 0px; 
+		left: 0px; 
+		width: 100%;
+		height: 100%;
+		bottom: 50px;
+		z-index: 3;
+	}
+	#framefooter { 
+		position: absolute; 
+		bottom: 0px; 
+		left: 0px;
+		width: 100%;
+		height: 50px;
+		z-index: 4;
+		background-color: white;
+	}
+	#layerpane {
+		position: absolute;
+		top:	20px;
+		right: 50px;
+		width: 250px;
+		z-index: 10;
+		background-color: rgba(180, 180, 180, 1);
+	}
+	.ol-attribution.ol-uncollapsible {
+		position: absolute;
+		bottom: 120px;
+		right: 0px;
+		width: 300px;
+		z-index: 11;
+	}
+	ul.layerlistroot {
+		list-style: none;
+	}
+	</style>
+	
+    <script type="text/javascript">
+	   var map = undefined;
+    	function mapinit() {
+	    	
+	      var targetmap = document.getElementById('framecontent');
+	      map = new ol.Map({
+	    	  keyboardEventTarget: document,		<!-- keyboard focus set to document, then zoom in and out with keys + - works -->
+	        layers: [
+	          new ol.layer.Tile({
+					title:	"OSM",
+	            source: new ol.source.OSM()
+	          })
+	        ],
+	        controls: ol.control.defaults({attributionOptions: {collapsible: false} }),
+	        target: targetmap,
+	        view: new ol.View({
+	          center: [0, 0],
+	          zoom: 2
+	        })
+	      });
+
+	      
+//var acturlhost = "https://" + window.location.host;
+			var acturlhost = "https://regio-osm.de";
+			var format = 'image/png';
+
+
+			var municipalityresultLayer = new ol.layer.Tile({
+				title:	"addresses_municipalities_fulfilled",
+				source: new ol.source.TileWMS({
+					url: acturlhost + "/geoserver/listofstreets/wms",
+					params: {
+						'LAYERS': 'listofstreets:addresses_municipalities_fulfilled',
+						'TILED': true
+					},
+					serverType: 'geoserver'
+			    }),
+				visible:			true,
+				transition:		0.8
+			});
+
+			var noaddresslayer = new ol.layer.Tile({
+				title:		"noaddresses", 
+				source: new ol.source.XYZ({url: "https://tile3.poole.ch/noaddress/{z}/{x}/{y}.png" }),
+				visible:		false
+	      });
+
+	      var hasaddresslayer = new ol.layer.Tile({
+				title:		"hasaddresses", 
+				source: new ol.source.XYZ({url: "https://tile3.poole.ch/has_address/{z}/{x}/{y}.png" }),
+				visible:		false
+	      });
+
+			map.addLayer(municipalityresultLayer);
+	      map.addLayer(noaddresslayer);
+	      map.addLayer(hasaddresslayer);
+    	}
+
+		function layertreeToggle() {
+			var layerpaneVisible = $( "#layerpane" ).visible;
+			$( "#layerpane" ).toggle('explode', 300);
+		};
+
+		function layerToggle(htmlelement) {
+			var layers = map.getLayers();
+			for(var itemindex = 0; itemindex < layers.getLength(); itemindex++) {
+				var element = layers.item(itemindex);
+				var htmlelementid = htmlelement.id;
+				var title = element.get('title');
+				console.log("+ layer " + title);
+				if (title == htmlelementid) {
+					var visible = element.getVisible();
+					console.log("  setze  Status: " + visible + " => " + !visible);
+					layers.item(itemindex).setVisible( !visible);
+					console.log("  danach Status " + layers.item(itemindex).getVisible());
+
+					var suchcheck = $("input[class='layercheckbox'][id='"+htmlelement.id+"']");
+					$(suchcheck).prop("checked", !visible);
+				}
+			}
+		};
+
+	</script>
+
+	<script type="text/javascript">
+		$(function() {
+			console.log("bin in jquery ready!");
+			mapinit();
+			$( "#layerpanetoggle" ).click(function() {
+				layertreeTogglerunEffect();
+				return false;
+			});
+		});
+	</script>	
+</head>
+<body>
+	<div id="framecontainer">
+		<div id="frametop"><p>ich bin das Top-Frame</p>
+		</div>
+		<div id="framecontent" class="map">
+			<div id="layerpane" visible="true">
+	
+				<!-- ul class="layerpaneTabs">
+					<li class="layerpanetoggle">XXX</li>
+				</ul-->
+				<div id="layercontent">
+					<div class="accordionContainer">
+						<div id="accordion1" class="accordion active">
+							<div class="tablecell">Overlays</div>	<!-- title layertree -->
+						</div>
+						<div id="container1" class="container-accordion active">
+							<div id="layertree" class="mb-element mb-element-layertree hidden" data-title="Layertree">
+								<ul class="layerlistroot">
+									<li class="layer">
+										<div class="layercontainer">
+											<input class="layercheckbox" type="checkbox" id="addresses_municipalities_fulfilled" checked>
+											<span id="addresses_municipalities_fulfilled" onClick="layerToggle(this);return false;">Evaluation Overview</span>
+										</div>
+									</li>
+
+									<li class="layer">
+										<div class="layercontainer">
+											<input class="layercheckbox" type="checkbox" id="noaddresses">
+											<span id="noaddresses" onClick="layerToggle(this);return false;">No Addresses</span>
+										</div>
+									</li>
+									<li class="layer">
+										<div class="layercontainer">
+											<input class="layercheckbox" type="checkbox" id="hasaddresses">
+											<span id="hasaddresses" onClick="layerToggle(this);return false;">Has Addresses</span>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>	<!--  end of layercontent -->
+			</div> <!--  end of layerpane -->
+		</div>
+		<div id="framefooter"><p>ich bin das Bottom-Frame</p>
+		</div>
+	</div>
+
+</body>
+</html>
